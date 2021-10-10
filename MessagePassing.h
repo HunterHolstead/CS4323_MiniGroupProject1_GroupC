@@ -5,5 +5,5 @@
 #include <stdlib.h>
 
 // define functions
-int menu(); // menu function at the beginning of program
+void menu(); // menu function at the beginning of program
 void messagePass(); // to handle message passing requirements

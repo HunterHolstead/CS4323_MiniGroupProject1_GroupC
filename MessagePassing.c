@@ -6,7 +6,7 @@
 #include "MessagePassing.h"
 
 //  function to display the menu to the client side
-int menu() {
+void menu() {
     // initialize variables to handle selection of user choice
     int selection; 
 
