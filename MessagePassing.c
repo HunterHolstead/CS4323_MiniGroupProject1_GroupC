@@ -12,25 +12,28 @@ void menu() {
 
     printf("Main Menu:\nPlease select an option below -\n\n");
     // display option choices to user
-    printf("1. Send the data to the server\n");
-    printf("2. Receive the file from the server\n");
-    printf("3. Terminate\n");
+    while(1) {
+        printf("1. Send the data to the server\n");
+        printf("2. Receive the file from the server\n");
+        printf("3. Terminate\n");
 
-    // Receive user's selection
-    printf("Selection: ");
-    scanf("%d", &selection);
+        // Receive user's selection
+        printf("Selection: ");
+        scanf("%d", &selection);
 
-    // upon the selection, determine which function to perform through switch
-    switch(selection) {
+        // upon the selection, determine which function to perform through switch
+        switch (selection) {
         case 1:
             messagePass();
         case 2:
             // here is where the function to receive files will be placed
         case 3:
-            printf("Program Terminated\n");
+            printf("\nProgram Terminated\n");
             exit(0);
-        default:
-            printf("Please select a proper choice!\n");
+        default: // handles when user inputs value not available
+            printf("\nPlease select a proper choice!\n\n");
+            break;
+        }
     }
 }
 
