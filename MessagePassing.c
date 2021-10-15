@@ -40,23 +40,43 @@ void menu() {
     Process A will be the parent function in this case, and Process B will be the child
     returns menu when finished   */
 void messagePass() {
-    // initialize variables
-    char message[100]; // made the size large for longer input cases
-    pid_t pid = fork(); // initialize the child Process B
+    //FILE *w; // file pointer for writing
+    //w = fopen(MESSAGE, "w"); // open "messageInfo.txt" for writing
+    int p[2]; // p[0] is for reading (Process B), p[1] is for writing (Process A)
 
-    // Process A writes the message the user wants to input
-    if (pid > 0) {
+    char message[100]; // made the size large for longer input cases
+    pid_t pid; // for handling processes
+
+    if (pipe(p) == -1) { // case when the pipe cannot be instantiate 
+        fprintf(stderr, "Pipe Couldn't be Made");
+        exit(2);
+    }
+    
+    pid = fork(); // initialize the child Process B
+    // pid > 0 is parent process, pid == 0 is child process
+    if (pid > 0) { // Process A writes the message the user wants to input
+        close(p[0]); // close reading end of pipe
+
         printf("\nWhat message would you like to send?\n");
         printf("Message: ");
-        scanf("%s", message);
+        scanf("%s", message); // get user input
+
+        write(p[1], message, sizeof(message)); // write the message to the pipe and close the write end of pipe
+        close(p[1]); // close writing end of pipe
+
         wait(NULL); // wait for child process to die
-        printf("\nMessage scanned!\n\n"); // used as notification of child process being killed
-        return menu(); // display the menu once again when finished
     }
-    else if (pid == 0) { // Process B scans the text written in Process A
+    else if (pid == 0) { // Process B reads the text written in Process A
+        close(p[1]); // close writing end
+        // read the message made in Process A from the pipe 
+        read(p[0], message, sizeof(message));
+        printf("\nMessage received is: %s\n\n", message); // test to make sure IPC functions properly
         /* *** here is where the method to scan what is written in Process A should be *** */
-        exit(0);
+        close(p[0]); // close reading end
+
+        exit(0); // kill child process at the end
     }
-    else 
+    else // if child process can't be created
         printf("Child process couldn't be created\n\n");
+    return menu(); // display the menu once again when finished
 }
