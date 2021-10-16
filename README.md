@@ -1,4 +1,6 @@
 # CS4323_MiniGroupProject1_GroupC
+A MakeFile has been included in order to make compiling every file together easier. To use MakeFile, convert from .txt to normal MakeFile. From there, you should only have to type in the command *"make"* or *"make groupC"* in order to compile the code. Then, entering *"./groupC"* should run the program. ***Do note that there may be compiler warnings, as the code is not fully completed, but it does run the code intended to be shown so far.***
+
 
 Compile the server: "gcc -o server MiniProject_Cook_Isabell.c -lpthread"
 Compile the client: "gcc -o main main.c -lpthread"
