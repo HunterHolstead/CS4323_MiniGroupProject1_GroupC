@@ -10,8 +10,8 @@ CFLAGS = -g -Wall
 default: groupC
 
 #	put all files into 1 file for easier compiling
-groupC: MessagePassing.o MiniProject_Cook_Isabell.o ProcessB_ThreadManagement.o main.o 
-	$(CC) $(CFLAGS) -o groupC main.o MessagePassing.o MiniProject_Cook_Isabell.o ProcessB_ThreadManagement.o -lpthread
+groupC: MessagePassing.o MiniProject_Cook_Isabell.o main.o 
+	$(CC) $(CFLAGS) -o groupC main.o MessagePassing.o MiniProject_Cook_Isabell.o -lpthread
 
 #	compile main and header file
 main.o: main.c MessagePassing.h clientHelper.h 
@@ -26,8 +26,12 @@ MiniProject_Cook_Isabell.o: MiniProject_Cook_Isabell.c clientHelper.h
 	$(CC) $(CFLAGS) -c MiniProject_Cook_Isabell.c -lpthread
 
 #	compile ProcessB_ThreadManagement.c file
-ProcessB_ThreadManagement.o: ProcessB_ThreadManagement.c 
-	$(CC) $(CFLAGS) -c ProcessB_ThreadManagement.c
+#ProcessB_ThreadManagement.o: ProcessB_ThreadManagement.c 
+#	$(CC) $(CFLAGS) -c ProcessB_ThreadManagement.c
+
+#	compile HunterHolstead.c file
+#HunterHolstead.o: HunterHolstead.c 
+#	$(CC) $(CFLAGS) -c HunterHolstead.c
 
 #	clean file
 clean:

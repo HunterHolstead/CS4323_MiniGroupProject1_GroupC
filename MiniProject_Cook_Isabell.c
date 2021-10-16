@@ -54,7 +54,7 @@ int socket_client;
  * Return type:
  *      void
 */
-void main(){
+void server(){ // was formerly main(). Changed to server in order to compile (Jeremiah)
     //int socket_server;
     //int socket_client;
     int address_size;
@@ -88,7 +88,8 @@ void main(){
         printf("Connected\n");
 
         //queue client
-        int clientPointer = malloc(sizeof(int));
+        int clientPointer; 
+        clientPointer = (int *) malloc(sizeof(int)); // was giving an initialization warning here (originally malloc(sizeof(int)))
         clientPointer = socket_client;
         addToQueue(clientPointer);
 

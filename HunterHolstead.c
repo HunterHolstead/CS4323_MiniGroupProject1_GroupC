@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h> // included for compilation (Jeremiah)
 
 int Random()
 {

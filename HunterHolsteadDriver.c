@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "HunterHolstead.h"
+// #include "HunterHolstead.h" // commented out to avoid multiple definition warning
 
 //This main method is just a series of tests written for each method
 int main()

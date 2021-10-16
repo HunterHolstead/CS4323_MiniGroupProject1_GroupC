@@ -57,6 +57,7 @@ void* manageThreads(void* ptrThreadT) {
 	return g_ptrThreadT;
 }
 
+/*	Commented out main function for compiling (Jeremiah)
 // Dummy driver function
 int main() {
 	// Test manageThreads
@@ -67,3 +68,4 @@ int main() {
 	free(ptrThreadT);
 	return 0;
 }
+*/

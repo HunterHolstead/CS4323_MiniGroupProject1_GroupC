@@ -19,11 +19,12 @@
  * Return type:
  *      void
 */
-void errorCheck (int dataToCheck, const char *errorMessage, int socket_client){
+void errorCheck1 (int dataToCheck, const char *errorMessage, int socket_client){
+    // renamed to errorCheck1 due to there being multiple definitions of errorCheck function (Jeremiah)
     if (dataToCheck < 0){
         printf("%s\n", errorMessage);
         close(socket_client);
-        exit(1);
+        //exit(1); // commented out to continue program in case server doesn't connect currently (Jeremiah)
     }
 }
 
@@ -45,7 +46,7 @@ int clientStarter(){
     //initialize client socket
     socket_client = socket(AF_INET, SOCK_STREAM,0);
 
-    errorCheck(socket_client, "Connection error.\n", socket_client);
+    errorCheck1(socket_client, "Connection error.\n", socket_client); // errorCheck1 change (Jeremiah)
 
     memset(&address_server, '\0', sizeof(address_server));
 
@@ -54,8 +55,9 @@ int clientStarter(){
     address_server.sin_port = htons(PORT);
     address_server.sin_addr.s_addr = INADDR_ANY;
 
-    //connect client socket to server
-    errorCheck(connect(socket_client, (struct sockaddr*) &address_server, sizeof(address_server)), "Failed to connect to server.\n", socket_client);
+    //connect client socket to server 
+    // errorCheck1 change (Jeremiah)
+    errorCheck1(connect(socket_client, (struct sockaddr*) &address_server, sizeof(address_server)), "Failed to connect to server.\n", socket_client);
 
     return socket_client;
 }
