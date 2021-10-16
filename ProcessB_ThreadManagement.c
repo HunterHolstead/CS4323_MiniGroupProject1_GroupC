@@ -1,3 +1,7 @@
+// Author: Kyle Kentner
+// Date: 10/15/2021
+// Program: manageThreads, which creates Thread T for Process B to facilitate encryption and client/server communications
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
