@@ -16,11 +16,8 @@
 */
 int main() { 
 	// run clientDriver and serverDriver files
-	clientDriver();
-	serverDriver();
-	// initialize client
-    int socket_client = clientStarter();
-
-	close(socket_client);
+	//clientDriver();
+	//serverDriver();
+    
     return 0;
 }

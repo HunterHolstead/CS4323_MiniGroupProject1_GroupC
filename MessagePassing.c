@@ -4,7 +4,7 @@
     jeremiah.pete@okstate.edu
 */
 #include "MessagePassing.h"
-#include "MiniProject_Cook_Isabell.c" // for connecting to server in option 2
+#include "clientHelper.h"
 #include "HunterHolstead.h" // for checking errors and encrypting messages
 
 //  function to display the menu to the client side
@@ -86,5 +86,6 @@ void messagePass() {
 /*  function to put together everything that should take place in option 2 */
 void receiveFile() {
     // connect to server
-    server();
+    clientStarter();
+    return menu();
 }
