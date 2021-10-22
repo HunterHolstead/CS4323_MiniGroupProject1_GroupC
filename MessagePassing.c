@@ -4,6 +4,8 @@
     jeremiah.pete@okstate.edu
 */
 #include "MessagePassing.h"
+#include "MiniProject_Cook_Isabell.c" // for connecting to server in option 2
+#include "HunterHolstead.h" // for checking errors and encrypting messages
 
 //  function to display the menu to the client side
 void menu() {
@@ -27,6 +29,7 @@ void menu() {
                 messagePass();
             case 2: // receive file from server
                 /* *** here is where the function to receive files will be placed *** */
+                receiveFile();
             case 3: // exit program
                 printf("\nProgram Terminated\n");
                 exit(0);
@@ -40,12 +43,11 @@ void menu() {
     Process A will be the parent function in this case, and Process B will be the child
     returns menu when finished   */
 void messagePass() {
-    //FILE *w; // file pointer for writing
-    //w = fopen(MESSAGE, "w"); // open "messageInfo.txt" for writing
     int p[2]; // p[0] is for reading (Process B), p[1] is for writing (Process A)
 
     char message[100]; // made the size large for longer input cases
     pid_t pid; // for handling processes
+    
 
     if (pipe(p) == -1) { // case when the pipe cannot be instantiate 
         fprintf(stderr, "Pipe Couldn't be Made");
@@ -79,4 +81,10 @@ void messagePass() {
     else // if child process can't be created
         printf("Child process couldn't be created\n\n");
     return menu(); // display the menu once again when finished
+}
+
+/*  function to put together everything that should take place in option 2 */
+void receiveFile() {
+    // connect to server
+    server();
 }
