@@ -7,10 +7,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <signal.h>
 
 // define functions
 void menu(); // menu function at the beginning of program
-void messagePass(); // to handle message passing requirements
+void messagePass(pid_t pid); // to handle message passing requirements
 void receiveFile(); // function to handle option 2
 
 int accessPBThreadManage(char message[]); // access the necessary info from Kyle's file

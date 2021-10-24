@@ -12,7 +12,9 @@
 //  function to display the menu to the client side
 void menu() {
     // initialize variables to handle selection of user choice
+    pid_t pid; // for handling processes
     int selection; 
+    int pbAlive = 0; // used to determine if Process B needs to be terminated or not
 
     printf("Main Menu:\n\nPlease select an option below -\n\n");
     // display option choices to user
@@ -28,12 +30,16 @@ void menu() {
         // upon the selection, determine which function to perform through switch
         switch (selection) {
             case 1: // go to messagePass
-                messagePass();
+                pbAlive = 1; // Process B should be alive
+                messagePass(pid);
             case 2: // receive file from server
+                if (pid == 0) { // Process B should be terminated (as with thread T)
+                    exit(0);
+                }
                 /* *** here is where the function to receive files will be placed *** */
             case 3: // exit program
                 printf("\nProgram Terminated\n");
-                exit(0);
+                kill(0, SIGKILL); // kill all running processes
             default: // handles when user inputs value not available
                 printf("\nPlease select a proper choice!\n\n");
         }
@@ -43,7 +49,7 @@ void menu() {
 /*  function to perform message passing in Option 1 of assignment
     Process A will be the parent function in this case, and Process B will be the child
     returns menu when finished   */
-void messagePass() {
+void messagePass(pid_t pid) {
     int q = Random(); // for encryption
     int p[2]; // p[0] is for reading (Process B), p[1] is for writing (Process A)
 
@@ -52,7 +58,7 @@ void messagePass() {
     getMessage(message); // retrieve message user wants to send
     char* temp = lowerCase(message, temp); // make message lowercase for checking
 
-    pid_t pid; // for handling processes
+    //pid_t pid; // for handling processes
     
     if (pipe(p) == -1) { // case when the pipe cannot be instantiate 
         fprintf(stderr, "Pipe Couldn't be Made");
@@ -87,7 +93,6 @@ void messagePass() {
         close(p[0]); // close reading end
 
         printf("\n"); // formatting
-        exit(0); // kill child process at the end
     }
     else // if child process can't be created
         printf("Child process couldn't be created\n\n");
