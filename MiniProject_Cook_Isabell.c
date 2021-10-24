@@ -1,5 +1,6 @@
 
 //  Group C server driver
+
 /**
  * Group C
  * Isabell Cook
@@ -57,7 +58,7 @@ int totalClients = 0;
  * Return type:
  *      void
 */
-void server(){
+void main(){
     int socket_server;
     int socket_client;
     socklen_t address_size;
