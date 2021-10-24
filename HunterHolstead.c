@@ -7,6 +7,7 @@
 
 char** generateDictionary(int wordslength, int listlength);
 void freeArray(char** dictionary, int listlength);
+char *invalidWord(char *wrongWord);
 
 int Random()
 {
@@ -80,7 +81,7 @@ char *Encrypt(char *encryptString, int size, int q)
 	for(int i = 0; i < size; i++)
 	{
 		p = MapCharToP(encryptString[i]);
-		encryptValues[i] = (p+q) % 53;
+		encryptValues[i] = (p+q) % 54;
 		encryptString[i] = MapPToChar(encryptValues[i]);
 	}
 	
@@ -102,14 +103,14 @@ char *Decrypt(char *decryptString, int size, int q)
 	for(int i = 0; i < size; i++)
 	{
 		p = MapCharToP(decryptString[i]);
-		decryptValues[i] = (p - q) % 53;
+		decryptValues[i] = (p - q) % 54;
 		decryptString[i] = MapPToChar(decryptValues[i]);
 	}
 
 	return decryptString;
 }
 
-int checkWord(char *test)
+char *checkWord(char *test)
 {
 	int listlength = 58122;
 	int wordslength = 45; //Longest possible word in english dictionary is 45 letters long
@@ -142,6 +143,10 @@ int checkWord(char *test)
 		else
 		{
 			printf("%s\n","It is not in the dictionary");
+			char *correction = invalidWord(test);
+			printf("%s\n","The corrected word is:");
+			printf("%s", &correction);
+			
 		}
 
     freeArray(dictionary, listlength);
@@ -149,6 +154,18 @@ int checkWord(char *test)
 	return isIn;
 }
 
+char *invalidWord(char *wrongWord)
+{
+	char correction[45]; //set to 45 because that is the longest word in the english dictionary
+	printf("%s", wrongWord);
+	printf("%s", " was detected to be an invalid word.");
+	printf("%s\n", "Please enter the corrected word:");
+	scanf("%s",&correction);
+	printf("%s\n", "You entered:");
+	printf("%s\n",correction);
+	
+	return *correction;
+}
 
 void freeArray(char** dictionary, int listlength) //This frees the memory allocated by generateDictionary
 {
@@ -180,6 +197,40 @@ char** generateDictionary(int listlength, int wordslength) //this generates a ch
     return dictionary;
 }
 
+void sendFileToServer(FILE *file);
+
+void sendFileToClient(FILE *file);
+
+void sendFileNameToClient(char *fileName);
+
+void sendFileNameToServer(char *fileName);
+
+void receiveFileNameFromServer();
+
+void receiveFileNameFromClient();
+
+void receiveFileFromServer();
+
+void receiveFileFromClient();
+
+/*
+Method to send and receive information:
+
+Client sending file to Server:
+
+client runs: SendFileToServer()
+server runs: receiveFileFromClient()
+server runs: sendFileNameToClient()
+client runs: receiveFileNameFromServer()
+
+Server sending file to Client:
+client runs: sendFileNameToServer();
+server runs: receiveFileNameFromClient();
+server runs: sendFileToClient();
+client runs: receiveFileFromServer();
+*/
+
+
 
 //This main method is just a series of tests written for each method
 int main()
@@ -203,12 +254,12 @@ int main()
 	//the following method will test the encryption method
 	char testString[] = "MEET YOU IN THE PARK";
 	size_t sizeOfArray = sizeof(testString)/sizeof(testString[0]);
-	const char *testEncrypt = Encrypt(testString, sizeOfArray, q);
+	char *testEncrypt = Encrypt(testString, sizeOfArray, q);
 	printf("%s\n", "The encrypted String:");
 	printf("%s\n", testEncrypt);
 	
 	//the following method will test the decryption method
-	const char *testDecrypt = Decrypt(testEncrypt, sizeOfArray, q);
+	char *testDecrypt = Decrypt(testEncrypt, sizeOfArray, q);
 	printf("%s\n", "The decrypted String:");
 	printf("%s\n", testDecrypt);
 	
@@ -219,5 +270,19 @@ int main()
 	printf("%s\n", "Dictionary test for applez:");
 	char dictionaryTest2[] = "applez";
 	checkWord(dictionaryTest2);
+	
 	return 0;
 }
+
+/*left to do:
+Break a sentence up into words.
+Pass each word into checkword
+fix invalidword method to return char[]
+
+Communication between server and client
+To Do:
+SendMessagetoServer()
+receiveFile()
+messageClientToPerformTask()
+
+*/
