@@ -84,10 +84,6 @@ void messagePass() {
         m.key = q;
         m.mThread = &T;
         accessPBThreadManage(message);
-        //printf("\nEncrypting...\n");
-        //getEncryption(message, q); // encrypt string
-        //printf("\nDecrypting...\n");
-        //getDecryption(message, q); // decrypt string
         close(p[0]); // close reading end
 
         printf("\n"); // formatting
@@ -119,26 +115,10 @@ char* lowerCase(char message[], char temp[]) {
     return temp;
 }
 
-char* getEncryption(char message[], int q) {
-    printf("The value of q is %d\n", q);
-    char* messageEncrypt = Encrypt(message, strlen(message) + 1, q);
-    printf("The encrypted string - %s\n\n", messageEncrypt);
-    sleep(3);
-
-    return messageEncrypt;
-}
-
-char* getDecryption(char message[], int q) {
-    char* messageDecrypt = Decrypt(message, strlen(message) + 1, q);
-    printf("The decrypted string - %s\n\n", messageDecrypt);
-    sleep(3);
-    return messageDecrypt;
-}
-
 /*  Create function to access ProcessB_ThreadManagement.c function coherently
     params: none
-    return: int */
-// utilizes Kyle's main method for basis on how to function
+    return: int 
+    utilizes Kyle's main method for basis on how to function */
 int accessPBThreadManage(char message[]) {
     pthread_mutex_t mutex; // create pthread mutex to be used by Thread T
 
