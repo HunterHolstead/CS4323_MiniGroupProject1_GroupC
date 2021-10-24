@@ -18,3 +18,5 @@ void receiveFile(); // function to handle option 2
 
 char* getMessage(char message[]);
 char* lowerCase(char message[], char temp[]);
+char* getEncryption(char message[], int q);
+char* getDecryption(char message[], int q);

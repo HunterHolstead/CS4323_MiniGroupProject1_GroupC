@@ -42,12 +42,14 @@ void menu() {
     Process A will be the parent function in this case, and Process B will be the child
     returns menu when finished   */
 void messagePass() {
+    int q = Random(); // for encryption
     int p[2]; // p[0] is for reading (Process B), p[1] is for writing (Process A)
 
     char message[200]; // made the size large for longer input cases
 
     getMessage(message); // retrieve message user wants to send
     char* temp = lowerCase(message, temp); // make message lowercase for checking
+    printf("Lower: %s\n", temp);
 
     pid_t pid; // for handling processes
     
@@ -71,12 +73,13 @@ void messagePass() {
         // read the message made in Process A from the pipe 
         read(p[0], message, sizeof(message));
         printf("\nMessage received is: %s\n\n", message); // test to make sure IPC functions properly
-        sleep(1); // sleep for a second
 
         /* *** here is where the method to scan what is written in Process A should be *** */
         checkWord(temp);
-        //const char messageEncrypt = Encrypt(*message, sizeof(message), Random());
-        //printf("The encrypted string: %s\n", messageEncrypt);
+        printf("\nEncrypting...\n");
+        getEncryption(message, q); // encrypt string
+        printf("\nDecrypting...\n");
+        getDecryption(message, q); // decrypt string
         close(p[0]); // close reading end
 
         printf("\n"); // formatting
@@ -94,7 +97,6 @@ char* getMessage(char message[]) {
     printf("\nWhat message would you like to send?\n");
     printf("Message: ");
     scanf(" %[^\n]", message);
-
     return message;
 }
 
@@ -107,6 +109,22 @@ char* lowerCase(char message[], char temp[]) {
     }
 
     return temp;
+}
+
+char* getEncryption(char message[], int q) {
+    printf("The value of q is %d\n", q);
+    char* messageEncrypt = Encrypt(message, strlen(message) + 1, q);
+    printf("The encrypted string - %s\n\n", messageEncrypt);
+    sleep(3);
+
+    return messageEncrypt;
+}
+
+char* getDecryption(char message[], int q) {
+    char* messageDecrypt = Decrypt(message, strlen(message) + 1, q);
+    printf("The decrypted string - %s\n\n", messageDecrypt);
+    sleep(3);
+    return messageDecrypt;
 }
 
 // test case 
