@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h> // included for compilation (Jeremiah)
+#define MAX 1000 //Max amount of chars sent through file
 
 char** generateDictionary(int wordslength, int listlength);
 void freeArray(char** dictionary, int listlength);
@@ -200,32 +201,117 @@ char** generateDictionary(int listlength, int wordslength) //this generates a ch
     return dictionary;
 }
 
-void sendFileToServer(FILE *file);
+void sendMessageToServer(char *encryptedMessage, int q)
+{
+	
+}
 
-void sendFileToClient(FILE *file);
+void receiveMessageFromClient(int socketclient)
+{
+  
+}
 
-void sendFileNameToClient(char *fileName);
+void sendFileToServer(FILE *file, int socketclient)
+{
+	char buffer[MAX] = {0};
 
-void sendFileNameToServer(char *fileName);
+	while(fgets(buffer, MAX, file) != NULL) //This line gets each line of the file being read
+	{
+		if (send(socketclient, buffer, sizeof(buffer), 0) == -1) //This line sends the data through the socket
+		{
+			perror("There was an error in sending the file.");
+			exit(1);
+		}
+		else
+		{
+			send(socketclient, buffer, sizeof(buffer), 0);
+		}
 
-void receiveFileNameFromServer();
+		bzero(buffer, MAX);
+	}
+}
 
-void receiveFileNameFromClient();
+void sendFileToClient(FILE *file, int socketclient)
+{
+	char buffer[MAX] = {0};
 
-void receiveFileFromServer();
+	while(fgets(buffer, MAX, file) != NULL) //This line gets each line of the file being read
+	{
+		if (send(socketclient, buffer, sizeof(buffer), 0) == -1) //This line sends the data through the socket
+		{
+			perror("There was an error in sending the file.");
+			exit(1);
+		}
+		else
+		{
+			send(socketclient, buffer, sizeof(buffer), 0);
+		}
 
-void receiveFileFromClient();
+		bzero(buffer, MAX);
+	}
+}
+
+void receiveFileFromServer()
+{
+	int n;
+	FILE *file;
+	char *filename = "file.txt";
+	char buffer[MAX];
+
+	file = fopen(filename, "w");
+	while (1) 
+	{
+		n = recv(socketclient, buffer, MAX, 0);
+		
+		if (n <= 0)
+		{
+			break;
+			return;
+		}
+
+		fprintf(file, "%s", buffer);
+		bzero(buffer, MAX);
+	}
+	
+	return;
+}
+
+void receiveFileFromClient()
+{
+	int n;
+	FILE *file;
+	char *filename = "file.txt";
+	char buffer[MAX];
+
+	file = fopen(filename, "w");
+	while (1) 
+	{
+		n = recv(socketclient, buffer, MAX, 0);
+		
+		if (n <= 0)
+		{
+			break;
+			return;
+		}
+
+		fprintf(file, "%s", buffer);
+		bzero(buffer, MAX);
+	}
+	
+	return;
+}
 
 /*
 Method to send and receive information:
 Client sending file to Server:
-client runs: SendFileToServer()
-server runs: receiveFileFromClient()
-server runs: sendFileNameToClient()
-client runs: receiveFileNameFromServer()
+client runs: SendMessageToServer()
+server runs: receiveMessageFromClient()
+server runs: sendFileToClient()
+client runs: receiveFileFromServer()
+
 Server sending file to Client:
-client runs: sendFileNameToServer();
-server runs: receiveFileNameFromClient();
+client runs: sendFileToServer();
+server runs: receiveFileFromClient();
 server runs: sendFileToClient();
 client runs: receiveFileFromServer();
 */
