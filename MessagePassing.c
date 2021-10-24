@@ -9,12 +9,14 @@
 #include "HunterHolstead.h" // for checking errors and encrypting messages
 #include "ProcessB_ThreadManagement.h"
 
+pthread_cond_t WAKE = PTHREAD_COND_INITIALIZER; // Create thread condition variable
+int done = 1; // for thread signal
+
 //  function to display the menu to the client side
 void menu() {
     // initialize variables to handle selection of user choice
     pid_t pid; // for handling processes
     int selection; 
-    int pbAlive = 0; // used to determine if Process B needs to be terminated or not
 
     printf("Main Menu:\n\nPlease select an option below -\n\n");
     // display option choices to user
@@ -30,7 +32,6 @@ void menu() {
         // upon the selection, determine which function to perform through switch
         switch (selection) {
             case 1: // go to messagePass
-                pbAlive = 1; // Process B should be alive
                 messagePass(pid);
             case 2: // receive file from server
                 if (pid == 0) { // Process B should be terminated (as with thread T)
@@ -57,8 +58,6 @@ void messagePass(pid_t pid) {
 
     getMessage(message); // retrieve message user wants to send
     char* temp = lowerCase(message, temp); // make message lowercase for checking
-
-    //pid_t pid; // for handling processes
     
     if (pipe(p) == -1) { // case when the pipe cannot be instantiate 
         fprintf(stderr, "Pipe Couldn't be Made");
@@ -76,6 +75,7 @@ void messagePass(pid_t pid) {
         wait(NULL); // wait for child process to die
     }
     else if (pid == 0) { // Process B reads the text written in Process A
+        pthread_cond_signal(&WAKE);
         struct theMessage m;
         close(p[1]); // close writing end
         // read the message made in Process A from the pipe 
@@ -166,10 +166,16 @@ int accessPBThreadManage(char message[]) {
 	printf("Unlocking mutex...\n");
 	pthread_mutex_unlock(&mutex);
 
-	// Get the filename (address) from Thread T and destroy the thread (this should occur prior to terminating Process B)
-	pthread_join(*ptrThreadT, (void**) &serverFileName);
-	printf("Server file address: %p\n", serverFileName);
-
+    if (done == 1) {
+	    // Get the filename (address) from Thread T and destroy the thread (this should occur prior to terminating Process B)
+        done = 2; // wait on WAKE
+	    pthread_join(*ptrThreadT, (void**) &serverFileName);
+	    printf("\nServer file address: %p\n", serverFileName);
+    }
+    else {
+        printf("Signaling condition variale WAKE\n");
+        pthread_cond_signal(&WAKE);
+    }
     printf("\nEncrypted String: %s\n", heapString);
     printf("Pointer: %p\n", heapString);
 	
