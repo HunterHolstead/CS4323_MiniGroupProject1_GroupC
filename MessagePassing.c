@@ -1,11 +1,13 @@
 /*  
     Group C
-    Jeremiah Pete
-    jeremiah.pete@okstate.edu
+    Author: Jeremiah Pete
+    Email: jeremiah.pete@okstate.edu
+    Program Description: This file handles the IPC using pipes and implements peer's files where needed
 */
 #include "MessagePassing.h"
 #include "clientHelper.h"
 #include "HunterHolstead.h" // for checking errors and encrypting messages
+#include "ProcessB_ThreadManagement.h"
 
 //  function to display the menu to the client side
 void menu() {
@@ -49,7 +51,6 @@ void messagePass() {
 
     getMessage(message); // retrieve message user wants to send
     char* temp = lowerCase(message, temp); // make message lowercase for checking
-    printf("Lower: %s\n", temp);
 
     pid_t pid; // for handling processes
     
@@ -69,17 +70,24 @@ void messagePass() {
         wait(NULL); // wait for child process to die
     }
     else if (pid == 0) { // Process B reads the text written in Process A
+        struct theMessage m;
         close(p[1]); // close writing end
         // read the message made in Process A from the pipe 
         read(p[0], message, sizeof(message));
-        printf("\nMessage received is: %s\n\n", message); // test to make sure IPC functions properly
+        printf("\nProcess B has received message: %s\n\n", message); // test to make sure IPC functions properly
 
-        /* *** here is where the method to scan what is written in Process A should be *** */
         checkWord(temp);
-        printf("\nEncrypting...\n");
-        getEncryption(message, q); // encrypt string
-        printf("\nDecrypting...\n");
-        getDecryption(message, q); // decrypt string
+        // implement struct values created in ProcessB_ThreadManagement.c 
+        pthread_t T; 
+        m.msg = message;
+        m.size = sizeof(message);
+        m.key = q;
+        m.mThread = &T;
+        accessPBThreadManage(message);
+        //printf("\nEncrypting...\n");
+        //getEncryption(message, q); // encrypt string
+        //printf("\nDecrypting...\n");
+        //getDecryption(message, q); // decrypt string
         close(p[0]); // close reading end
 
         printf("\n"); // formatting
@@ -125,6 +133,75 @@ char* getDecryption(char message[], int q) {
     printf("The decrypted string - %s\n\n", messageDecrypt);
     sleep(3);
     return messageDecrypt;
+}
+
+/*  Create function to access ProcessB_ThreadManagement.c function coherently
+    params: none
+    return: int */
+// utilizes Kyle's main method for basis on how to function
+int accessPBThreadManage(char message[]) {
+    pthread_mutex_t mutex; // create pthread mutex to be used by Thread T
+
+	// Variables for handling random numbers
+	time_t t;
+	srand((unsigned) time(&t));
+
+	// Get a random encryption key
+	int myKey = Random();
+	printf("Key generated: %d\n", myKey);
+
+	// Test getFileName
+	char* strServer = getFileName("Server_");
+	printf("%s\n", strServer);
+	free(strServer);
+		
+	// Pointer to the filename returned by the server
+	char* serverFileName;
+	
+	// Declare a pointer to Thread T
+	pthread_t* ptrThreadT = NULL;
+	
+	// Run-time initialization of the pthread mutex with default attributes
+	if (pthread_mutex_init(&mutex, NULL) != 0) {
+		return 1;
+	}
+	
+	// Lock the mutex initially; disallow the thread from returning the file name until Process B terminates
+	pthread_mutex_lock(&mutex);
+	
+	char* heapString = (char*) malloc(strlen(message));
+	strcpy(heapString, message);
+	printf("String: %s\n", heapString);
+	printf("Pointer: %p\n", heapString);
+
+	// Test manageThreads (ptrThreadT passed back by reference)
+	manageThreads(&ptrThreadT, heapString, strlen(message), myKey);
+
+	// Unlock the mutex to return the filename for the encrypted message
+	printf("Unlocking mutex...\n");
+	pthread_mutex_unlock(&mutex);
+
+	// Get the filename (address) from Thread T and destroy the thread (this should occur prior to terminating Process B)
+	pthread_join(*ptrThreadT, (void**) &serverFileName);
+	printf("Server file address: %p\n", serverFileName);
+
+    printf("\nEncrypted String: %s\n", heapString);
+    printf("Pointer: %p\n", heapString);
+	
+	// Free the heap memory associated with the thread pointer
+	printf("Freeing memory for pointer %p...\n", ptrThreadT);
+	free(ptrThreadT);
+
+	// Free the heap memory associated with the string pointer
+	printf("Freeing memory for pointer %p...\n", heapString);
+	free(heapString);
+	
+	// Destroy the lock
+	if (pthread_mutex_destroy(&mutex) != 0) {
+		return 1;
+	}
+	
+	return 0;    
 }
 
 // test case 

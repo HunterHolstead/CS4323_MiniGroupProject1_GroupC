@@ -16,7 +16,9 @@ void menu(); // menu function at the beginning of program
 void messagePass(); // to handle message passing requirements
 void receiveFile(); // function to handle option 2
 
-char* getMessage(char message[]);
-char* lowerCase(char message[], char temp[]);
-char* getEncryption(char message[], int q);
-char* getDecryption(char message[], int q);
+int accessPBThreadManage(char message[]); // access the necessary info from Kyle's file
+
+char* getMessage(char message[]); // retrieve user message 
+char* lowerCase(char message[], char temp[]); // convert message to all lower case
+char* getEncryption(char message[], int q); // perform encryption from Hunter's file 
+char* getDecryption(char message[], int q); // perform decryption from Hunter's file
