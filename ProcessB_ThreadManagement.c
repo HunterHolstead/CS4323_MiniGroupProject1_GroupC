@@ -1,5 +1,5 @@
 // Author: Kyle Kentner
-// Date: 10/19/2021
+// Date: 10/24/2021
 // Program: manageThreads, which creates Thread T for Process B to facilitate encryption and client/server communications
 
 #include <stdlib.h>
@@ -32,7 +32,7 @@ int threadBusy = 0;
 // Based in-part on add_threads.c POSIX demonstration by Dr. Shital Joshi
 void manageThreads(pthread_t** ptrThreadT, char* msgToEncrypt, int msgSize, int encryptKey);
 
-// Get a unique filename for saving (uses Random from HunterHolstead.h)
+// Get a unique filename for saving
 char* getFileName(const char* strPrefix) {
 	// Allocate space for the new filename and apply the prefix
 	char* fileName = (char*) malloc(sizeof(char) * MAX_FNAME);
@@ -59,7 +59,6 @@ char* getFileName(const char* strPrefix) {
 	
 	return fileName;
 }
-
 
 // Function for Thread T to run (string, size, and key sent via struct)
 char* EncryptAndSend(struct theMessage* encryptMsg) {
