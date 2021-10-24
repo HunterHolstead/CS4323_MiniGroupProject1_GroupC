@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-// #include "HunterHolstead.h" // commented out to avoid multiple definition warning
+#include "HunterHolstead.h" // commented out to avoid multiple definition warning
 
 //This main method is just a series of tests written for each method
 int main()
@@ -24,12 +24,12 @@ int main()
 	//the following method will test the encryption method
 	char testString[] = "MEET YOU IN THE PARK";
 	size_t sizeOfArray = sizeof(testString)/sizeof(testString[0]);
-	const char *testEncrypt = Encrypt(testString, sizeOfArray, 3);
+	const char *testEncrypt = Encrypt(testString, sizeOfArray, q);
 	printf("%s\n", "The encrypted String:");
 	printf("%s\n", testEncrypt);
 	
 	//the following method will test the decryption method
-	const char *testDecrypt = Decrypt(testEncrypt, sizeOfArray, 3);
+	const char *testDecrypt = Decrypt(testEncrypt, sizeOfArray, q);
 	printf("%s\n", "The decrypted String:");
 	printf("%s\n", testDecrypt);
 	

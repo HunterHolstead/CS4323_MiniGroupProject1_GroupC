@@ -11,7 +11,7 @@ int Random()
 	
 	srand((unsigned) time(&t));
 	
-	int random = rand();
+	int random = rand() % 100; // This will make the random number between 0 and 99
 	
 	//print statement for testing purposes
 	/*printf("%s\n", "Random Number generated:");
@@ -103,7 +103,7 @@ const char *Decrypt(char *decryptString, int size, int q)
 		decryptString[i] = MapPToChar(decryptValues[i]);
 	}
 
-	return decryptString;
+	return *decryptString;
 }
 
 /*

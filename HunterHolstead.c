@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <time.h> // included for compilation (Jeremiah)
 
+char** generateDictionary(int rows, int col);
+void freeArray(char** dictionary, int listlength);
+
 int Random()
 {
 	time_t t;
@@ -106,7 +109,78 @@ const char *Decrypt(char *decryptString, int size, int q)
 	return decryptString;
 }
 
-/*
+int checkWord(char *word)
+{
+	int listlength = 58122;
+	int wordslength = 45; //Longest possible word in english dictionary is 45 letters long
+	
+    char** dictionary = generateDictionary(listlength, wordslength);
+	char test[] = "apple";//*word;
+	char* result;
+	int isIn;
+
+    for(int i=0;i<58122;i++)
+	{
+		result = strstr(dictionary[i],test);
+		
+		if(result)
+		{
+			isIn=1;
+			break;
+		}
+		else
+		{
+			isIn=0;
+		}
+			
+    }
+	
+		if(isIn)
+		{
+			printf("%s\n","It is in the dictionary");
+		}
+		else
+		{
+			printf("%s\n","It is not in the dictionary");
+		}
+
+    freeArray(dictionary, listlength);
+	
+	return isIn;
+}
+
+
+char** generateDictionary(int listlength, int wordslength) 
+{
+    char** dictionary = malloc(sizeof(char*) * listlength);
+
+    for (int i = 0; i < listlength; i++) 
+	{
+        dictionary[i] = malloc(sizeof(char) * (wordslength + 1));
+    }
+
+    FILE* infile = fopen("dictionary.txt", "r");
+
+    for (int i = 0; i < listlength; i++) 
+	{
+        fgets(dictionary[i], wordslength + 1, infile);
+    }
+
+    fclose(infile);
+
+    return dictionary;
+}
+
+void freeArray(char** dictionary, int listlength)
+{
+    for(int i=0; i<listlength; i++)
+	{
+        free(dictionary[i]);
+    }
+    free(dictionary);
+}
+
+
 //This main method is just a series of tests written for each method
 int main()
 {
@@ -138,6 +212,13 @@ int main()
 	printf("%s\n", "The decrypted String:");
 	printf("%s\n", testDecrypt);
 	
+	//the following method will test the dictionary method
+	char testWord1[] = "apple";
+	printf("%s\n", "Testing dictionary for apple:");
+	checkWord(testWord1);
+	printf("%s\n", "Testing dictionary for applez:");
+	char testWord2[] = "applez";
+	checkWord(testWord2);
+	
 	return 0;
 }
-*/
