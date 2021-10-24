@@ -171,13 +171,69 @@ char *invalidWord(char *wrongWord)
 }
 */
 
-void freeArray(char** dictionary, int listlength) //This frees the memory allocated by generateDictionary
+int getNumberOfWords(char *sentence)
 {
-    for(int i=0; i<listlength; i++)
+	char sentence2[45];
+	strcpy(sentence2, sentence);
+	int numberOfWords = 0;
+	printf("%s\n", sentence2);
+	char* tok = strtok(sentence2, " ");
+	
+	while (tok != NULL) 
 	{
-        free(dictionary[i]);
+		printf("%s\n", tok);
+		tok = strtok(NULL, " ");
+		numberOfWords++;
     }
-    free(dictionary);
+	
+	printf("%s\n", sentence);
+	printf("%s\n", "The number of words is: ");
+	printf("%d\n", numberOfWords);
+	
+	return numberOfWords;
+}
+
+char** generateSentenceArray(char* sentence, int numberOfWords, int maxLength)
+{	
+	char sentence2[45];
+	strcpy(sentence2, sentence);
+	printf("%s\n", sentence);
+	
+	
+	char** sentenceArray = (char**)malloc(numberOfWords * sizeof(char*));
+	
+	for(int i = 0; i < numberOfWords; i++) 
+	{
+        sentenceArray[i] = (char*)malloc((numberOfWords + 1) * sizeof(char));
+    }
+	
+	int i = 0;
+	char* word = strtok(sentence2, " ");
+	
+	while (word != NULL) 
+	{
+		//printf("%s\n", word);
+		sentenceArray[i] = word;
+		printf("%s\n", "elements of the sentence array");
+		printf("%s\n", sentenceArray[i]);
+		while(!checkWord(sentenceArray[i])) {
+			printf("\nWord %s not found; please re-enter: ", sentenceArray[i]);
+			scanf("%s", sentenceArray[i]);
+			}
+			word = strtok(NULL, " ");
+			i++;
+    }
+	
+	return sentenceArray;
+}
+
+void freeArray(char** array, int length) //This frees the memory allocated by generateDictionary and sentenceSplit
+{
+    for(int i=0; i<length; i++)
+	{
+        free(array[i]);
+    }
+    free(array);
 }
 
 char** generateDictionary(int listlength, int wordslength) //this generates a char[] that is equal to the dictionary
@@ -201,6 +257,7 @@ char** generateDictionary(int listlength, int wordslength) //this generates a ch
     return dictionary;
 }
 
+/*
 void sendMessageToServer(char *encryptedMessage, int q)
 {
 	
@@ -255,7 +312,7 @@ void receiveFileFromServer()
 {
 	int n;
 	FILE *file;
-	char *filename = getFileName(/*const char* strPrefix*/);
+	char *filename = getFileName(/*const char* strPrefix);
 	char buffer[MAX];
 
 	file = fopen(filename, "w");
@@ -280,7 +337,7 @@ void receiveFileFromClient()
 {
 	int n;
 	FILE *file;
-	char *filename = getFileName(/*const char* strPrefix*/);
+	char *filename = getFileName(/*const char* strPrefix*;
 	char buffer[MAX];
 
 	file = fopen(filename, "w");
@@ -299,7 +356,7 @@ void receiveFileFromClient()
 	}
 	
 	return;
-}
+}*/
 
 /*
 Method to send and receive information:
@@ -350,6 +407,7 @@ int main()
 	printf("%s\n", testDecrypt);
 	
 	//the following method will test the dictionary method
+	//set to 45 because that is the longest word in the english dictionary
 	char dictionaryTest[] = "apple";
 	printf("%s\n", "Dictionary test for apple:");
 	
@@ -379,6 +437,18 @@ int main()
 	// Kyle: This should be the corrected word
 	printf("Corrected word: %s\n", dynString);
 	free(dynString);
+	
+	//This is a test for sentence splitting
+	char testSentence[] = ("How many times can I abcd the string");
+	int testWordNumber = getNumberOfWords(testSentence);
+	printf("%s\n", testSentence);
+	char** sentenceArray = generateSentenceArray(testSentence,testWordNumber,46);
+	for(int i = 0; i < testWordNumber; i++)
+	{
+			printf("%s\n", sentenceArray[i]);
+	}
+	printf("%s\n", testSentence);
+	free(sentenceArray);
 	
 	return 0;
 }
