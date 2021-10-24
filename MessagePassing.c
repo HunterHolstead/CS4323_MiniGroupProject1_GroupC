@@ -3,17 +3,18 @@
     Author: Jeremiah Pete
     Email: jeremiah.pete@okstate.edu
     Program Description: This file handles the IPC using pipes and implements peer's files where needed
+    To compile solo, uncomment the main method (since it must be compiled together with the clientDriver),  
+    then use command gcc -o message MessagePassing.c -lpthread
 */
 #include "MessagePassing.h"
-#include "clientHelper.h"
-#include "HunterHolstead.h" // for checking errors and encrypting messages
+#include "HunterHolstead.h"
 #include "ProcessB_ThreadManagement.h"
 
 pthread_cond_t WAKE = PTHREAD_COND_INITIALIZER; // Create thread condition variable
 int done = 1; // for thread signal
 
 //  function to display the menu to the client side
-void menu() {
+int menu() {
     // initialize variables to handle selection of user choice
     pid_t pid; // for handling processes
     int selection; 
@@ -50,7 +51,7 @@ void menu() {
 /*  function to perform message passing in Option 1 of assignment
     Process A will be the parent function in this case, and Process B will be the child
     returns menu when finished   */
-void messagePass(pid_t pid) {
+int messagePass(pid_t pid) {
     int q = Random(); // for encryption
     int p[2]; // p[0] is for reading (Process B), p[1] is for writing (Process A)
 
@@ -195,8 +196,9 @@ int accessPBThreadManage(char message[]) {
 	return 0;    
 }
 
+/*
 // test case 
 int main() {
     menu();
     return 0;
-}
+}  */
