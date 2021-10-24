@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include "HunterHolstead.h"
 
+#define MAX_FNAME 64
+
 // Defining a struct for the word to encrypt (needed in pthread_create)
 struct theMessage {
 	// Message variables
@@ -27,8 +29,37 @@ pthread_mutex_t mutex;
 int reuse = 0;
 int threadBusy = 0;
 
-// Based on add_threads.c POSIX demonstration by Dr. Shital Joshi
+// Based in-part on add_threads.c POSIX demonstration by Dr. Shital Joshi
 void manageThreads(pthread_t** ptrThreadT, char* msgToEncrypt, int msgSize, int encryptKey);
+
+// Get a unique filename for saving (uses Random from HunterHolstead.h)
+char* getFileName(const char* strPrefix, time_t t) {
+	// Allocate space for the new filename and apply the prefix
+	char* fileName = (char*) malloc(sizeof(char) * MAX_FNAME);
+	strcpy(fileName, strPrefix);
+	
+	// Skip over the initialized characters
+	int i = 0;
+	while (fileName[i] != '\0') {
+		i++;
+	}
+	
+	// Append random letters to the end of the filename
+	while (i < MAX_FNAME - 4) {
+		// Get a random letter
+		fileName[i] = (char) (65 + rand() % 26);
+		i++;
+	}
+
+	// Append the file extension
+	fileName[i++] = '.';
+	fileName[i++] = 't';
+	fileName[i++] = 'x';
+	fileName[i] = 't';
+	
+	return fileName;
+}
+
 
 // Function for Thread T to run (string, size, and key sent via struct)
 char* EncryptAndSend(struct theMessage* encryptMsg) {
@@ -54,6 +85,34 @@ char* EncryptAndSend(struct theMessage* encryptMsg) {
 	threadBusy = 0;
 	pthread_mutex_lock(&mutex);
 	printf("Thread unlocked\n");	
+
+	return fileName;
+}
+
+// Function for Thread T to run (string, size, and key sent via struct)
+char* SendAndDecrypt(struct theMessage* decryptMsg) {
+	struct theMessage myMsg = *decryptMsg;
+
+	// Dereference encryptMsg's members to get encryptString, size, and q
+	char* stringToDecrypt = myMsg.msg;
+	int msgSize = myMsg.size;
+	int msgKey = myMsg.key;
+	
+	// Call Encrypt to get the encrypted string
+	const char* decryptedString = Decrypt(stringToDecrypt, msgSize, msgKey);
+	
+	// TODO: Send the string to the server and receive the filename in return
+	char* fileName = (char*) 0xDEADBEEF; // = sendMessageToServer() // This value will be returned by the thread once Process B terminates
+	
+	// Free the heap memory associated with the struct
+	free(decryptMsg);
+
+	// TODO: Disconnect from the server and go to sleep
+	// Wait for Process B to unlock the mutex before proceeding
+	printf("Locking thread...\n");
+	threadBusy = 0;
+	pthread_mutex_lock(&mutex);
+	printf("Thread unlocked\n");
 
 	return fileName;
 }
@@ -104,7 +163,7 @@ void manageThreads(pthread_t** ptrThreadT, char* msgToEncrypt, int msgSize, int 
 		threadBusy = 1;
 		
 		// Reuse Thread T by sending its pointer back to pthread_create (recycle the resources)
-		if (pthread_create(args->mThread, NULL, (void*) &EncryptAndSend, args) != 0) {
+		if (pthread_create(args->mThread, NULL, (void*) &SendAndDecrypt, args) != 0) {
 			printf("Error: Unable to create Thread T.\n");
 		}
 
@@ -116,6 +175,22 @@ void manageThreads(pthread_t** ptrThreadT, char* msgToEncrypt, int msgSize, int 
 //	Commented out main function for compiling (Jeremiah)
 // Dummy driver function
 int main() {
+	// Variables for handling random numbers
+	time_t t;
+	srand((unsigned) time(&t));
+
+	// Get a random encryption key
+	int myKey = Random();
+	printf("Key generated: %d\n", myKey);
+
+	// Test getFileName
+	char* strServer = getFileName("Server_", t);
+	printf("%s\n", strServer);
+	free(strServer);
+	char* strClient = getFileName("Client_", t);
+	printf("%s\n", strClient);
+	free(strClient);
+	
 	// Pointer to the filename returned by the server
 	char* serverFileName;
 	
@@ -139,10 +214,10 @@ int main() {
 	printf("Pointer: %p\n", heapString);
 
 	// Test manageThreads (ptrThreadT passed back by reference)
-	manageThreads(&ptrThreadT, heapString, sizeOfArray, 3);
+	manageThreads(&ptrThreadT, heapString, sizeOfArray, myKey);
 
 	// Test case in which Thread T's pointer has been initialized
-	manageThreads(&ptrThreadT, heapString, sizeOfArray, 3);
+	manageThreads(&ptrThreadT, heapString, sizeOfArray, myKey);
 	
 	// Unlock the mutex to return the filename for the encrypted message
 	printf("Unlocking mutex...\n");
