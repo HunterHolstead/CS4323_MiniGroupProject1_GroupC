@@ -1,9 +1,7 @@
 # CS4323_MiniGroupProject1_GroupC
-A MakeFile has been included in order to make compiling every file together easier. To use MakeFile, convert from .txt to normal MakeFile. From there, you should only have to type in the command *"make"* or *"make groupC"* in order to compile the code. Then, entering *"./groupC"* should run the program. ***Do note that there may be compiler warnings, as the code is not fully completed, but it does run the code intended to be shown so far.***
 
-
-Compile the server: "gcc -o server MiniProject_Cook_Isabell.c -lpthread"
-Compile the client: "gcc -o main main.c -lpthread"
+Compile the server: "gcc -o server serverDriver.c -lpthread"
+Compile the client: "gcc -o client clientDriver.c MessagePassing.c -lpthread"
 Run server: ./server
 Run client: ./client
 
@@ -33,7 +31,7 @@ Option 2 connects to the server and has the user choose which file it
 wants to receive from the server. From there, the client process will 
 decrypt the message and display it to the console. 
 
-Option 3 closes the client process.
+Option 3 closes all running processes and exits the program.
 
 SERVER:
 The server program will show a demonstration of a queued entry of clients via mutex locks and condition
