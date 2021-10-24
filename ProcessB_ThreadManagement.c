@@ -33,7 +33,7 @@ int threadBusy = 0;
 void manageThreads(pthread_t** ptrThreadT, char* msgToEncrypt, int msgSize, int encryptKey);
 
 // Get a unique filename for saving (uses Random from HunterHolstead.h)
-char* getFileName(const char* strPrefix, time_t t) {
+char* getFileName(const char* strPrefix) {
 	// Allocate space for the new filename and apply the prefix
 	char* fileName = (char*) malloc(sizeof(char) * MAX_FNAME);
 	strcpy(fileName, strPrefix);
@@ -184,13 +184,10 @@ int main() {
 	printf("Key generated: %d\n", myKey);
 
 	// Test getFileName
-	char* strServer = getFileName("Server_", t);
+	char* strServer = getFileName("Server_");
 	printf("%s\n", strServer);
 	free(strServer);
-	char* strClient = getFileName("Client_", t);
-	printf("%s\n", strClient);
-	free(strClient);
-	
+		
 	// Pointer to the filename returned by the server
 	char* serverFileName;
 	
