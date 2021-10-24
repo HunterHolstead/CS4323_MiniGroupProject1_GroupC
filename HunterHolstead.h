@@ -3,7 +3,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h> // included here for compilation reasons (Jeremiah)
+#include <time.h> // included for compilation (Jeremiah)
+
+char** generateDictionary(int wordslength, int listlength);
+void freeArray(char** dictionary, int listlength);
 
 int Random()
 {
@@ -11,7 +14,7 @@ int Random()
 	
 	srand((unsigned) time(&t));
 	
-	int random = rand() % 100; // This will make the random number between 0 and 99
+	int random = rand() % 20;
 	
 	//print statement for testing purposes
 	/*printf("%s\n", "Random Number generated:");
@@ -62,7 +65,7 @@ char MapPToChar(int p)
 	return mappedChar;
 }
 
-const char *Encrypt(char *encryptString, int size, int q)
+char *Encrypt(char *encryptString, int size, int q)
 {
 	printf("%s\n", "String before Encryption:");
 	printf("%s\n", encryptString);
@@ -77,14 +80,14 @@ const char *Encrypt(char *encryptString, int size, int q)
 	for(int i = 0; i < size; i++)
 	{
 		p = MapCharToP(encryptString[i]);
-		encryptValues[i] = (p+q) % 52;
+		encryptValues[i] = (p+q) % 53;
 		encryptString[i] = MapPToChar(encryptValues[i]);
 	}
 	
 	return encryptString;
 }
 
-const char *Decrypt(char *decryptString, int size, int q)
+char *Decrypt(char *decryptString, int size, int q)
 {
 	printf("%s\n", "String before Decryption:");
 	printf("%s\n", decryptString);
@@ -99,11 +102,82 @@ const char *Decrypt(char *decryptString, int size, int q)
 	for(int i = 0; i < size; i++)
 	{
 		p = MapCharToP(decryptString[i]);
-		decryptValues[i] = (p - q) % 52;
+		decryptValues[i] = (p - q) % 53;
 		decryptString[i] = MapPToChar(decryptValues[i]);
 	}
 
-	return *decryptString;
+	return decryptString;
+}
+
+int checkWord(char *test)
+{
+	int listlength = 58122;
+	int wordslength = 45; //Longest possible word in english dictionary is 45 letters long
+	
+    char** dictionary = generateDictionary(listlength, wordslength);
+	//char test[] = "apple";//*word;
+	char* result;
+	int isIn;
+
+    for(int i=0;i<58122;i++)
+	{
+		result = strstr(dictionary[i],test);
+		
+		if(result)
+		{
+			isIn=1;
+			break;
+		}
+		else
+		{
+			isIn=0;
+		}
+			
+    }
+	
+		if(isIn)
+		{
+			printf("%s\n","It is in the dictionary");
+		}
+		else
+		{
+			printf("%s\n","It is not in the dictionary");
+		}
+
+    freeArray(dictionary, listlength);
+	
+	return isIn;
+}
+
+
+void freeArray(char** dictionary, int listlength) //This frees the memory allocated by generateDictionary
+{
+    for(int i=0; i<listlength; i++)
+	{
+        free(dictionary[i]);
+    }
+    free(dictionary);
+}
+
+char** generateDictionary(int listlength, int wordslength) //this generates a char[] that is equal to the dictionary
+{
+    char** dictionary = malloc(listlength * sizeof(char*));
+
+	FILE* infile = fopen("dictionary.txt", "r");
+
+    for(int i = 0; i < listlength; i++) 
+	{
+        dictionary[i] = malloc((wordslength + 1) * sizeof(char));
+    }
+
+    for(int i = 0; i < listlength; i++) 
+	{
+        fgets(dictionary[i], wordslength + 1, infile);
+    }
+
+    fclose(infile);
+
+    return dictionary;
 }
 
 /*
@@ -129,15 +203,21 @@ int main()
 	//the following method will test the encryption method
 	char testString[] = "MEET YOU IN THE PARK";
 	size_t sizeOfArray = sizeof(testString)/sizeof(testString[0]);
-	const char *testEncrypt = Encrypt(testString, sizeOfArray, 3);
+	const char *testEncrypt = Encrypt(testString, sizeOfArray, q);
 	printf("%s\n", "The encrypted String:");
 	printf("%s\n", testEncrypt);
 	
 	//the following method will test the decryption method
-	const char *testDecrypt = Decrypt(testEncrypt, sizeOfArray, 3);
+	const char *testDecrypt = Decrypt(testEncrypt, sizeOfArray, q);
 	printf("%s\n", "The decrypted String:");
 	printf("%s\n", testDecrypt);
 	
+	//the following method will test the dictionary method
+	char dictionaryTest[] = "apple";
+	printf("%s\n", "Dictionary test for apple:");
+	checkWord(dictionaryTest);
+	printf("%s\n", "Dictionary test for applez:");
+	char dictionaryTest2[] = "applez";
+	checkWord(dictionaryTest2);
 	return 0;
-}
-*/
+}*/

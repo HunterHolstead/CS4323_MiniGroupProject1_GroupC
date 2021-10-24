@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h> // included for compilation (Jeremiah)
 
-char** generateDictionary(int rows, int col);
+char** generateDictionary(int wordslength, int listlength);
 void freeArray(char** dictionary, int listlength);
 
 int Random()
@@ -14,7 +14,7 @@ int Random()
 	
 	srand((unsigned) time(&t));
 	
-	int random = rand() % 100;
+	int random = rand() % 20;
 	
 	//print statement for testing purposes
 	/*printf("%s\n", "Random Number generated:");
@@ -80,7 +80,7 @@ char *Encrypt(char *encryptString, int size, int q)
 	for(int i = 0; i < size; i++)
 	{
 		p = MapCharToP(encryptString[i]);
-		encryptValues[i] = (p+q) % 52;
+		encryptValues[i] = (p+q) % 53;
 		encryptString[i] = MapPToChar(encryptValues[i]);
 	}
 	
@@ -102,7 +102,7 @@ char *Decrypt(char *decryptString, int size, int q)
 	for(int i = 0; i < size; i++)
 	{
 		p = MapCharToP(decryptString[i]);
-		decryptValues[i] = (p - q) % 52;
+		decryptValues[i] = (p - q) % 53;
 		decryptString[i] = MapPToChar(decryptValues[i]);
 	}
 
