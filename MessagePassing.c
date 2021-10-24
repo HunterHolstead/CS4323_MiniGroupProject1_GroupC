@@ -47,6 +47,7 @@ void messagePass() {
     char message[200]; // made the size large for longer input cases
 
     getMessage(message); // retrieve message user wants to send
+    char* temp = lowerCase(message, temp); // make message lowercase for checking
 
     pid_t pid; // for handling processes
     
@@ -70,13 +71,15 @@ void messagePass() {
         // read the message made in Process A from the pipe 
         read(p[0], message, sizeof(message));
         printf("\nMessage received is: %s\n\n", message); // test to make sure IPC functions properly
-        sleep(2); // sleep for 2 seconds
+        sleep(1); // sleep for a second
+
         /* *** here is where the method to scan what is written in Process A should be *** */
-        //checkWord(*message);
+        checkWord(temp);
         //const char messageEncrypt = Encrypt(*message, sizeof(message), Random());
         //printf("The encrypted string: %s\n", messageEncrypt);
         close(p[0]); // close reading end
 
+        printf("\n"); // formatting
         exit(0); // kill child process at the end
     }
     else // if child process can't be created
@@ -93,6 +96,17 @@ char* getMessage(char message[]) {
     scanf(" %[^\n]", message);
 
     return message;
+}
+
+/*  function to make message input all lowercase in order for checkWord to work
+    params: char message[] 
+    returns: all lowercase version of message (temp) */
+char* lowerCase(char message[], char temp[]) {
+    for (int i = 0; i < strlen(message) + 1; i++) {
+        temp[i] = tolower(message[i]);
+    }
+
+    return temp;
 }
 
 // test case 
