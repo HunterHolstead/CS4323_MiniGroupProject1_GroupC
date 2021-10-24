@@ -14,7 +14,7 @@ int Random()
 	
 	srand((unsigned) time(&t));
 	
-	int random = rand();
+	int random = rand() % 100;
 	
 	//print statement for testing purposes
 	/*printf("%s\n", "Random Number generated:");
@@ -65,7 +65,7 @@ char MapPToChar(int p)
 	return mappedChar;
 }
 
-const char *Encrypt(char *encryptString, int size, int q)
+char *Encrypt(char *encryptString, int size, int q)
 {
 	printf("%s\n", "String before Encryption:");
 	printf("%s\n", encryptString);
@@ -87,7 +87,7 @@ const char *Encrypt(char *encryptString, int size, int q)
 	return encryptString;
 }
 
-const char *Decrypt(char *decryptString, int size, int q)
+char *Decrypt(char *decryptString, int size, int q)
 {
 	printf("%s\n", "String before Decryption:");
 	printf("%s\n", decryptString);
@@ -109,13 +109,13 @@ const char *Decrypt(char *decryptString, int size, int q)
 	return decryptString;
 }
 
-int checkWord(char *word)
+int checkWord(char *test)
 {
 	int listlength = 58122;
 	int wordslength = 45; //Longest possible word in english dictionary is 45 letters long
 	
     char** dictionary = generateDictionary(listlength, wordslength);
-	char test[] = "apple";//*word;
+	//char test[] = "apple";//*word;
 	char* result;
 	int isIn;
 
@@ -150,18 +150,27 @@ int checkWord(char *word)
 }
 
 
-char** generateDictionary(int listlength, int wordslength) 
+void freeArray(char** dictionary, int listlength) //This frees the memory allocated by generateDictionary
 {
-    char** dictionary = malloc(sizeof(char*) * listlength);
-
-    for (int i = 0; i < listlength; i++) 
+    for(int i=0; i<listlength; i++)
 	{
-        dictionary[i] = malloc(sizeof(char) * (wordslength + 1));
+        free(dictionary[i]);
+    }
+    free(dictionary);
+}
+
+char** generateDictionary(int listlength, int wordslength) //this generates a char[] that is equal to the dictionary
+{
+    char** dictionary = malloc(listlength * sizeof(char*));
+
+	FILE* infile = fopen("dictionary.txt", "r");
+
+    for(int i = 0; i < listlength; i++) 
+	{
+        dictionary[i] = malloc((wordslength + 1) * sizeof(char));
     }
 
-    FILE* infile = fopen("dictionary.txt", "r");
-
-    for (int i = 0; i < listlength; i++) 
+    for(int i = 0; i < listlength; i++) 
 	{
         fgets(dictionary[i], wordslength + 1, infile);
     }
@@ -169,15 +178,6 @@ char** generateDictionary(int listlength, int wordslength)
     fclose(infile);
 
     return dictionary;
-}
-
-void freeArray(char** dictionary, int listlength)
-{
-    for(int i=0; i<listlength; i++)
-	{
-        free(dictionary[i]);
-    }
-    free(dictionary);
 }
 
 
@@ -203,22 +203,21 @@ int main()
 	//the following method will test the encryption method
 	char testString[] = "MEET YOU IN THE PARK";
 	size_t sizeOfArray = sizeof(testString)/sizeof(testString[0]);
-	const char *testEncrypt = Encrypt(testString, sizeOfArray, 3);
+	const char *testEncrypt = Encrypt(testString, sizeOfArray, q);
 	printf("%s\n", "The encrypted String:");
 	printf("%s\n", testEncrypt);
 	
 	//the following method will test the decryption method
-	const char *testDecrypt = Decrypt(testEncrypt, sizeOfArray, 3);
+	const char *testDecrypt = Decrypt(testEncrypt, sizeOfArray, q);
 	printf("%s\n", "The decrypted String:");
 	printf("%s\n", testDecrypt);
 	
 	//the following method will test the dictionary method
-	char testWord1[] = "apple";
-	printf("%s\n", "Testing dictionary for apple:");
-	checkWord(testWord1);
-	printf("%s\n", "Testing dictionary for applez:");
-	char testWord2[] = "applez";
-	checkWord(testWord2);
-	
+	char dictionaryTest[] = "apple";
+	printf("%s\n", "Dictionary test for apple:");
+	checkWord(dictionaryTest);
+	printf("%s\n", "Dictionary test for applez:");
+	char dictionaryTest2[] = "applez";
+	checkWord(dictionaryTest2);
 	return 0;
 }
