@@ -29,7 +29,6 @@ void menu() {
                 messagePass();
             case 2: // receive file from server
                 /* *** here is where the function to receive files will be placed *** */
-                receiveFile();
             case 3: // exit program
                 printf("\nProgram Terminated\n");
                 exit(0);
@@ -45,23 +44,21 @@ void menu() {
 void messagePass() {
     int p[2]; // p[0] is for reading (Process B), p[1] is for writing (Process A)
 
-    char message[100]; // made the size large for longer input cases
+    char message[200]; // made the size large for longer input cases
+
+    getMessage(message); // retrieve message user wants to send
+
     pid_t pid; // for handling processes
     
-
     if (pipe(p) == -1) { // case when the pipe cannot be instantiate 
         fprintf(stderr, "Pipe Couldn't be Made");
         exit(2);
     }
-    
+
     pid = fork(); // initialize the child Process B
     // pid > 0 is parent process, pid == 0 is child process
     if (pid > 0) { // Process A writes the message the user wants to input
         close(p[0]); // close reading end of pipe
-
-        printf("\nWhat message would you like to send?\n");
-        printf("Message: ");
-        scanf("%s", message); // get user input
 
         write(p[1], message, sizeof(message)); // write the message to the pipe and close the write end of pipe
         close(p[1]); // close writing end of pipe
@@ -73,7 +70,11 @@ void messagePass() {
         // read the message made in Process A from the pipe 
         read(p[0], message, sizeof(message));
         printf("\nMessage received is: %s\n\n", message); // test to make sure IPC functions properly
+        sleep(2); // sleep for 2 seconds
         /* *** here is where the method to scan what is written in Process A should be *** */
+        //checkWord(*message);
+        //const char messageEncrypt = Encrypt(*message, sizeof(message), Random());
+        //printf("The encrypted string: %s\n", messageEncrypt);
         close(p[0]); // close reading end
 
         exit(0); // kill child process at the end
@@ -83,9 +84,19 @@ void messagePass() {
     return menu(); // display the menu once again when finished
 }
 
-/*  function to put together everything that should take place in option 2 */
-void receiveFile() {
-    // connect to server
-    clientStarter();
-    return menu();
+/*  function to get message input from user
+    params: char message[] (initialized in menu function)
+    returns: stdin string message */
+char* getMessage(char message[]) {
+    printf("\nWhat message would you like to send?\n");
+    printf("Message: ");
+    scanf(" %[^\n]", message);
+
+    return message;
+}
+
+// test case 
+int main() {
+    menu();
+    return 0;
 }

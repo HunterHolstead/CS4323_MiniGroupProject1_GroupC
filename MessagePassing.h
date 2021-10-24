@@ -14,3 +14,5 @@
 void menu(); // menu function at the beginning of program
 void messagePass(); // to handle message passing requirements
 void receiveFile(); // function to handle option 2
+
+char* getMessage();
