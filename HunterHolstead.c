@@ -255,7 +255,7 @@ void receiveFileFromServer()
 {
 	int n;
 	FILE *file;
-	char *filename = "file.txt";
+	char *filename = getFileName(/*const char* strPrefix*/);
 	char buffer[MAX];
 
 	file = fopen(filename, "w");
@@ -280,7 +280,7 @@ void receiveFileFromClient()
 {
 	int n;
 	FILE *file;
-	char *filename = "file.txt";
+	char *filename = getFileName(/*const char* strPrefix*/);
 	char buffer[MAX];
 
 	file = fopen(filename, "w");
