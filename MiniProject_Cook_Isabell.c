@@ -1,6 +1,5 @@
 
 //  Group C server driver
-
 /**
  * Group C
  * Isabell Cook
@@ -28,7 +27,6 @@ void destroyThread();
 int removeFromQueue();
 void * threadTask();
 void *threadHandleClient (int *address_client);
-void messageClientToPerformTask(int socketclient);
 
 //initialize a mutex lock for thread synchronization
 pthread_mutex_t lockThread;
