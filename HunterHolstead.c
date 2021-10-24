@@ -16,7 +16,7 @@ int Random()
 	
 	srand((unsigned) time(&t));
 	
-	int random = rand() % 20;
+	int random = (rand() % 20)+1;
 	
 	//print statement for testing purposes
 	/*printf("%s\n", "Random Number generated:");
@@ -218,14 +218,11 @@ void receiveFileFromClient();
 
 /*
 Method to send and receive information:
-
 Client sending file to Server:
-
 client runs: SendFileToServer()
 server runs: receiveFileFromClient()
 server runs: sendFileNameToClient()
 client runs: receiveFileNameFromServer()
-
 Server sending file to Client:
 client runs: sendFileNameToServer();
 server runs: receiveFileNameFromClient();
@@ -310,5 +307,4 @@ To Do:
 SendMessagetoServer()
 receiveFile()
 messageClientToPerformTask()
-
 */
