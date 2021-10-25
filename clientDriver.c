@@ -12,12 +12,9 @@
  *      void
 */
 int main() {
-
     int socket_client = clientStarter();
 
-    while (1)
-    {
-
+    while (1) {
         int threadNumber = 0;
         recv(socket_client, &threadNumber, sizeof(threadNumber), 0);
         if(threadNumber < 3){ 

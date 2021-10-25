@@ -2,6 +2,7 @@
     Group C
     Author: Jeremiah Pete
     Email: jeremiah.pete@okstate.edu
+
     Program Description: This file handles the IPC using pipes and implements peer's files where needed
     To compile solo, uncomment the main method (since it must be compiled together with the clientDriver),  
     then use command gcc -o message MessagePassing.c -lpthread
@@ -35,9 +36,9 @@ int menu() {
             case 1: // go to messagePass
                 messagePass(pid);
             case 2: // receive file from server
-                if (pid == 0) { // Process B should be terminated (as with thread T)
-                    exit(0);
-                }
+                // Process B should be killed (as with thread T)
+                printf("%c\n", pid);
+                return menu();
                 /* *** here is where the function to receive files will be placed *** */
             case 3: // exit program
                 printf("\nProgram Terminated\n");
@@ -50,7 +51,8 @@ int menu() {
 
 /*  function to perform message passing in Option 1 of assignment
     Process A will be the parent function in this case, and Process B will be the child
-    returns menu when finished   */
+    params: pid_t pid
+    returns: menu   */
 int messagePass(pid_t pid) {
     int q = Random(); // for encryption
     int p[2]; // p[0] is for reading (Process B), p[1] is for writing (Process A)
@@ -83,7 +85,7 @@ int messagePass(pid_t pid) {
         read(p[0], message, sizeof(message));
         printf("\nProcess B has received message: %s\n\n", message); // test to make sure IPC functions properly
 
-        checkWord(temp);
+        checkWord(temp); // use checkWord function from Hunter's file
         // implement struct values created in ProcessB_ThreadManagement.c 
         pthread_t T; 
         m.msg = message;
@@ -196,9 +198,9 @@ int accessPBThreadManage(char message[]) {
 	return 0;    
 }
 
-/*
+
 // test case 
 int main() {
     menu();
     return 0;
-}  */
+}  
