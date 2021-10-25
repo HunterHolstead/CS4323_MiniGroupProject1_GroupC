@@ -3,10 +3,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
 #include <time.h> // included for compilation (Jeremiah)
+#define SIZE 1024 //size of the data sent through file
+#define MAX_FNAME 64 //Kyle
 
 char** generateDictionary(int wordslength, int listlength);
 void freeArray(char** dictionary, int listlength);
+char *invalidWord(char *wrongWord);
+char *Encrypt(char *encryptString, int size, int q);
+char *Decrypt(char *decryptString, int size, int q);
 
 int Random()
 {
@@ -14,13 +22,42 @@ int Random()
 	
 	srand((unsigned) time(&t));
 	
-	int random = rand() % 20;
+	int random = (rand() % 20)+1;
 	
 	//print statement for testing purposes
 	/*printf("%s\n", "Random Number generated:");
 	printf("%d\n", random);*/
 	
 	return random;
+}
+
+//Kyle
+// Get a unique filename for saving (uses Random from HunterHolstead.h)
+char* getFileName(const char* strPrefix) {
+	// Allocate space for the new filename and apply the prefix
+	char* fileName = (char*) malloc(sizeof(char) * MAX_FNAME);
+	strcpy(fileName, strPrefix);
+	
+	// Skip over the initialized characters
+	int i = 0;
+	while (fileName[i] != '\0') {
+		i++;
+	}
+	
+	// Append random letters to the end of the filename
+	while (i < MAX_FNAME - 4) {
+		// Get a random letter
+		fileName[i] = (char) (65 + rand() % 26);
+		i++;
+	}
+
+	// Append the file extension
+	fileName[i++] = '.';
+	fileName[i++] = 't';
+	fileName[i++] = 'x';
+	fileName[i] = 't';
+	
+	return fileName;
 }
 
 int MapCharToP(char c)
@@ -80,7 +117,7 @@ char *Encrypt(char *encryptString, int size, int q)
 	for(int i = 0; i < size; i++)
 	{
 		p = MapCharToP(encryptString[i]);
-		encryptValues[i] = (p+q) % 53;
+		encryptValues[i] = (p+q) % 54;
 		encryptString[i] = MapPToChar(encryptValues[i]);
 	}
 	
@@ -102,7 +139,7 @@ char *Decrypt(char *decryptString, int size, int q)
 	for(int i = 0; i < size; i++)
 	{
 		p = MapCharToP(decryptString[i]);
-		decryptValues[i] = (p - q) % 53;
+		decryptValues[i] = (p - q) % 54;
 		decryptString[i] = MapPToChar(decryptValues[i]);
 	}
 
@@ -142,6 +179,10 @@ int checkWord(char *test)
 		else
 		{
 			printf("%s\n","It is not in the dictionary");
+			//char *correction = invalidWord(test);
+			//printf("%s\n","The corrected word is:");
+			//printf("%s", correction);
+			
 		}
 
     freeArray(dictionary, listlength);
@@ -149,14 +190,84 @@ int checkWord(char *test)
 	return isIn;
 }
 
-
-void freeArray(char** dictionary, int listlength) //This frees the memory allocated by generateDictionary
+/*
+char *invalidWord(char *wrongWord)
 {
-    for(int i=0; i<listlength; i++)
+	char correction[45]; //set to 45 because that is the longest word in the english dictionary
+	printf("%s", wrongWord);
+	printf("%s", " was detected to be an invalid word.");
+	printf("%s\n", "Please enter the corrected word:");
+	scanf("%s", correction);
+	printf("%s\n", "You entered:");
+	printf("%s\n",correction);
+	
+	return *correction;
+}
+*/
+
+int getNumberOfWords(char *sentence)
+{
+	char sentence2[45];
+	strcpy(sentence2, sentence);
+	int numberOfWords = 0;
+	printf("%s\n", sentence2);
+	char* tok = strtok(sentence2, " ");
+	
+	while (tok != NULL) 
 	{
-        free(dictionary[i]);
+		printf("%s\n", tok);
+		tok = strtok(NULL, " ");
+		numberOfWords++;
     }
-    free(dictionary);
+	
+	printf("%s\n", sentence);
+	printf("%s\n", "The number of words is: ");
+	printf("%d\n", numberOfWords);
+	
+	return numberOfWords;
+}
+
+char** generateSentenceArray(char* sentence, int numberOfWords, int maxLength)
+{	
+	char sentence2[45];
+	strcpy(sentence2, sentence);
+	printf("%s\n", sentence);
+	
+	
+	char** sentenceArray = (char**)malloc(numberOfWords * sizeof(char*));
+	
+	for(int i = 0; i < numberOfWords; i++) 
+	{
+        sentenceArray[i] = (char*)malloc((numberOfWords + 1) * sizeof(char));
+    }
+	
+	int i = 0;
+	char* word = strtok(sentence2, " ");
+	
+	while (word != NULL) 
+	{
+		//printf("%s\n", word);
+		sentenceArray[i] = word;
+		printf("%s\n", "elements of the sentence array");
+		printf("%s\n", sentenceArray[i]);
+		while(!checkWord(sentenceArray[i])) {
+			printf("\nWord %s not found; please re-enter: ", sentenceArray[i]);
+			scanf("%s", sentenceArray[i]);
+			}
+			word = strtok(NULL, " ");
+			i++;
+    }
+	
+	return sentenceArray;
+}
+
+void freeArray(char** array, int length) //This frees the memory allocated by generateDictionary and sentenceSplit
+{
+    for(int i=0; i<length; i++)
+	{
+        free(array[i]);
+    }
+    free(array);
 }
 
 char** generateDictionary(int listlength, int wordslength) //this generates a char[] that is equal to the dictionary
@@ -180,7 +291,134 @@ char** generateDictionary(int listlength, int wordslength) //this generates a ch
     return dictionary;
 }
 
+void sendFileToServer(FILE *file, int socketclient)
+{
+  char buffer[SIZE] = {0};
+
+  while(fgets(buffer, SIZE, file) != NULL) 
+  {
+    if (send(socketclient, buffer, sizeof(buffer), 0) == -1) 
+	{
+      perror("[-]Error in sending file.");
+      exit(1);
+    }
+    bzero(buffer, SIZE);
+  }
+}
+
+void sendMessageToServer(int socketclient, char *encryptedMessage, int q)
+{
+	send(socketclient, q, sizeof(int),0);
+	send(socketclient, encryptedMessage, sizeof(char),0);
+}
+
+void receiveMessageFromClient(int socketclient, const char* strPrefix)
+{
+  FILE *file;
+  char *filename = getFileName(strPrefix);
+  int nbytes;
+  char buffer[SIZE];
+
+  file = fopen(filename, "w");
+  
+  while (1) 
+  {
+    nbytes = recv(socketclient, buffer, SIZE, 0);
+    
+	if (nbytes <= 0)
+	{
+      break;
+    }
+    
+	fprintf(file, "%s", buffer);
+    bzero(buffer, SIZE);
+  }
+  
+  return;
+}
+
+void sendFileToClient(FILE *file, int socketclient)
+{
+  char buffer[SIZE] = {0};
+
+  while(fgets(buffer, SIZE, file) != NULL) 
+  {
+    if (send(socketclient, buffer, sizeof(buffer), 0) == -1) 
+	{
+      perror("[-]Error in sending file.");
+      exit(1);
+    }
+    bzero(buffer, SIZE);
+  }
+}
+
+void receiveFileFromServer(int socketclient, const char* strPrefix)
+{
+  FILE *file;
+  char *filename = getFileName(strPrefix);
+  int nbytes;
+  char buffer[SIZE];
+
+  file = fopen(filename, "w");
+  
+  while (1) 
+  {
+    nbytes = recv(socketclient, buffer, SIZE, 0);
+    
+	if (nbytes <= 0)
+	{
+      break;
+    }
+    
+	fprintf(file, "%s", buffer);
+    bzero(buffer, SIZE);
+  }
+  
+  return;
+}
+
+void receiveFileFromClient(int socketclient, const char* strPrefix)
+{
+  FILE *file;
+  char *filename = getFileName(strPrefix);
+  int nbytes;
+  char buffer[SIZE];
+
+  file = fopen(filename, "w");
+  
+  while (1) 
+  {
+    nbytes = recv(socketclient, buffer, SIZE, 0);
+    
+	if (nbytes <= 0)
+	{
+      break;
+    }
+    
+	fprintf(file, "%s", buffer);
+    bzero(buffer, SIZE);
+  }
+  
+  return;
+}
+
 /*
+Method to send and receive information:
+Client sending file to Server:
+client runs: SendMessageToServer()
+server runs: receiveMessageFromClient()
+server runs: sendFileToClient()
+client runs: receiveFileFromServer()
+
+Server sending file to Client:
+client runs: sendFileToServer();
+server runs: receiveFileFromClient();
+server runs: sendFileToClient();
+client runs: receiveFileFromServer();
+*/
+
+
+
 //This main method is just a series of tests written for each method
 int main()
 {
@@ -203,21 +441,70 @@ int main()
 	//the following method will test the encryption method
 	char testString[] = "MEET YOU IN THE PARK";
 	size_t sizeOfArray = sizeof(testString)/sizeof(testString[0]);
-	const char *testEncrypt = Encrypt(testString, sizeOfArray, q);
+	char *testEncrypt = Encrypt(testString, sizeOfArray, q);
 	printf("%s\n", "The encrypted String:");
 	printf("%s\n", testEncrypt);
 	
 	//the following method will test the decryption method
-	const char *testDecrypt = Decrypt(testEncrypt, sizeOfArray, q);
+	char *testDecrypt = Decrypt(testEncrypt, sizeOfArray, q);
 	printf("%s\n", "The decrypted String:");
 	printf("%s\n", testDecrypt);
 	
 	//the following method will test the dictionary method
+	//set to 45 because that is the longest word in the english dictionary
 	char dictionaryTest[] = "apple";
 	printf("%s\n", "Dictionary test for apple:");
-	checkWord(dictionaryTest);
+	
+	// Kyle: New string for testing
+	char* dynString = (char*) malloc(sizeof(char) * 45);
+	strcpy(dynString, dictionaryTest);
+	printf("String: %s Pointer: %p\n", dynString, dynString);
+	
+	// Kyle: Loop while incorrect
+	while(!checkWord(dynString)) {
+		printf("\nWord %s not found; please re-enter: ", dynString);
+		scanf("%s", dynString);
+	}
+	
 	printf("%s\n", "Dictionary test for applez:");
 	char dictionaryTest2[] = "applez";
-	checkWord(dictionaryTest2);
+	
+	// Kyle: Reinitialize dynString for the second test
+	strcpy(dynString, dictionaryTest2);
+	
+	// Kyle: Loop while incorrect
+	while(!checkWord(dynString)) {
+		printf("\nWord %s not found; please re-enter: ", dynString);
+		scanf("%s", dynString);
+	}
+	
+	// Kyle: This should be the corrected word
+	printf("Corrected word: %s\n", dynString);
+	free(dynString);
+	
+	//This is a test for sentence splitting
+	char testSentence[] = ("How many times can I split the string");
+	int testWordNumber = getNumberOfWords(testSentence);
+	printf("%s\n", testSentence);
+	char** sentenceArray = generateSentenceArray(testSentence,testWordNumber,46);
+	for(int i = 0; i < testWordNumber; i++)
+	{
+			printf("%s\n", sentenceArray[i]);
+	}
+	printf("%s\n", testSentence);
+	free(sentenceArray);
+	
 	return 0;
-}*/
+}
+
+/*left to do:
+Break a sentence up into words.
+Pass each word into checkword
+fix invalidword method to return char[]
+
+Communication between server and client
+To Do:
+SendMessagetoServer()
+receiveFile()
+messageClientToPerformTask()
+*/

@@ -4,12 +4,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
 #include <time.h> // included for compilation (Jeremiah)
-#define MAX 1024 //Max amount of chars sent through file
+#define SIZE 1024 //size of the data sent through file
+#define MAX_FNAME 64 //Kyle
 
 char** generateDictionary(int wordslength, int listlength);
 void freeArray(char** dictionary, int listlength);
 char *invalidWord(char *wrongWord);
+char *Encrypt(char *encryptString, int size, int q);
+char *Decrypt(char *decryptString, int size, int q);
 
 int Random()
 {
@@ -24,6 +29,35 @@ int Random()
 	printf("%d\n", random);*/
 	
 	return random;
+}
+
+//Kyle
+// Get a unique filename for saving (uses Random from HunterHolstead.h)
+char* getFileName(const char* strPrefix) {
+	// Allocate space for the new filename and apply the prefix
+	char* fileName = (char*) malloc(sizeof(char) * MAX_FNAME);
+	strcpy(fileName, strPrefix);
+	
+	// Skip over the initialized characters
+	int i = 0;
+	while (fileName[i] != '\0') {
+		i++;
+	}
+	
+	// Append random letters to the end of the filename
+	while (i < MAX_FNAME - 4) {
+		// Get a random letter
+		fileName[i] = (char) (65 + rand() % 26);
+		i++;
+	}
+
+	// Append the file extension
+	fileName[i++] = '.';
+	fileName[i++] = 't';
+	fileName[i++] = 'x';
+	fileName[i] = 't';
+	
+	return fileName;
 }
 
 int MapCharToP(char c)
@@ -272,14 +306,35 @@ void sendFileToServer(FILE *file, int socketclient)
   }
 }
 
-void sendMessageToServer(char *encryptedMessage, int q)
+void sendMessageToServer(int socketclient, char *encryptedMessage, int q)
 {
-	
+	send(socketclient, q, sizeof(int),0);
+	send(socketclient, encryptedMessage, sizeof(char),0);
 }
 
-void receiveMessageFromClient(int socketclient)
+void receiveMessageFromClient(int socketclient, const char* strPrefix)
 {
+  FILE *file;
+  char *filename = getFileName(strPrefix);
+  int nbytes;
+  char buffer[SIZE];
+
+  file = fopen(filename, "w");
   
+  while (1) 
+  {
+    nbytes = recv(socketclient, buffer, SIZE, 0);
+    
+	if (nbytes <= 0)
+	{
+      break;
+    }
+    
+	fprintf(file, "%s", buffer);
+    bzero(buffer, SIZE);
+  }
+  
+  return;
 }
 
 void sendFileToClient(FILE *file, int socketclient)
@@ -300,7 +355,7 @@ void sendFileToClient(FILE *file, int socketclient)
 void receiveFileFromServer(int socketclient, const char* strPrefix)
 {
   FILE *file;
-  char *filename = getFileName(const char* strPrefix);
+  char *filename = getFileName(strPrefix);
   int nbytes;
   char buffer[SIZE];
 
@@ -310,12 +365,12 @@ void receiveFileFromServer(int socketclient, const char* strPrefix)
   {
     nbytes = recv(socketclient, buffer, SIZE, 0);
     
-	if (n <= 0)
+	if (nbytes <= 0)
 	{
       break;
     }
     
-	fprintf(fp, "%s", buffer);
+	fprintf(file, "%s", buffer);
     bzero(buffer, SIZE);
   }
   
@@ -325,7 +380,7 @@ void receiveFileFromServer(int socketclient, const char* strPrefix)
 void receiveFileFromClient(int socketclient, const char* strPrefix)
 {
   FILE *file;
-  char *filename = getFileName(const char* strPrefix);
+  char *filename = getFileName(strPrefix);
   int nbytes;
   char buffer[SIZE];
 
@@ -335,12 +390,12 @@ void receiveFileFromClient(int socketclient, const char* strPrefix)
   {
     nbytes = recv(socketclient, buffer, SIZE, 0);
     
-	if (n <= 0)
+	if (nbytes <= 0)
 	{
       break;
     }
     
-	fprintf(fp, "%s", buffer);
+	fprintf(file, "%s", buffer);
     bzero(buffer, SIZE);
   }
   
