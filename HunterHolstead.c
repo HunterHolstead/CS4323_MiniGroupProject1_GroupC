@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h> // included for compilation (Jeremiah)
-#define MAX 1000 //Max amount of chars sent through file
+#define MAX 1024 //Max amount of chars sent through file
 
 char** generateDictionary(int wordslength, int listlength);
 void freeArray(char** dictionary, int listlength);
@@ -257,7 +257,21 @@ char** generateDictionary(int listlength, int wordslength) //this generates a ch
     return dictionary;
 }
 
-/*
+void sendFileToServer(FILE *file, int socketclient)
+{
+  char buffer[SIZE] = {0};
+
+  while(fgets(buffer, SIZE, file) != NULL) 
+  {
+    if (send(socketclient, buffer, sizeof(buffer), 0) == -1) 
+	{
+      perror("[-]Error in sending file.");
+      exit(1);
+    }
+    bzero(buffer, SIZE);
+  }
+}
+
 void sendMessageToServer(char *encryptedMessage, int q)
 {
 	
@@ -268,95 +282,70 @@ void receiveMessageFromClient(int socketclient)
   
 }
 
-void sendFileToServer(FILE *file, int socketclient)
-{
-	char buffer[MAX] = {0};
-
-	while(fgets(buffer, MAX, file) != NULL) //This line gets each line of the file being read
-	{
-		if (send(socketclient, buffer, sizeof(buffer), 0) == -1) //This line sends the data through the socket
-		{
-			perror("There was an error in sending the file.");
-			exit(1);
-		}
-		else
-		{
-			send(socketclient, buffer, sizeof(buffer), 0);
-		}
-
-		bzero(buffer, MAX);
-	}
-}
-
 void sendFileToClient(FILE *file, int socketclient)
 {
-	char buffer[MAX] = {0};
+  char buffer[SIZE] = {0};
 
-	while(fgets(buffer, MAX, file) != NULL) //This line gets each line of the file being read
+  while(fgets(buffer, SIZE, file) != NULL) 
+  {
+    if (send(socketclient, buffer, sizeof(buffer), 0) == -1) 
 	{
-		if (send(socketclient, buffer, sizeof(buffer), 0) == -1) //This line sends the data through the socket
-		{
-			perror("There was an error in sending the file.");
-			exit(1);
-		}
-		else
-		{
-			send(socketclient, buffer, sizeof(buffer), 0);
-		}
-
-		bzero(buffer, MAX);
-	}
+      perror("[-]Error in sending file.");
+      exit(1);
+    }
+    bzero(buffer, SIZE);
+  }
 }
 
-void receiveFileFromServer()
+void receiveFileFromServer(int socketclient, const char* strPrefix)
 {
-	int n;
-	FILE *file;
-	char *filename = getFileName(/*const char* strPrefix);
-	char buffer[MAX];
+  FILE *file;
+  char *filename = getFileName(const char* strPrefix);
+  int nbytes;
+  char buffer[SIZE];
 
-	file = fopen(filename, "w");
-	while (1) 
+  file = fopen(filename, "w");
+  
+  while (1) 
+  {
+    nbytes = recv(socketclient, buffer, SIZE, 0);
+    
+	if (n <= 0)
 	{
-		n = recv(socketclient, buffer, MAX, 0);
-		
-		if (n <= 0)
-		{
-			break;
-			return;
-		}
-
-		fprintf(file, "%s", buffer);
-		bzero(buffer, MAX);
-	}
-	
-	return;
+      break;
+    }
+    
+	fprintf(fp, "%s", buffer);
+    bzero(buffer, SIZE);
+  }
+  
+  return;
 }
 
-void receiveFileFromClient()
+void receiveFileFromClient(int socketclient, const char* strPrefix)
 {
-	int n;
-	FILE *file;
-	char *filename = getFileName(/*const char* strPrefix*;
-	char buffer[MAX];
+  FILE *file;
+  char *filename = getFileName(const char* strPrefix);
+  int nbytes;
+  char buffer[SIZE];
 
-	file = fopen(filename, "w");
-	while (1) 
+  file = fopen(filename, "w");
+  
+  while (1) 
+  {
+    nbytes = recv(socketclient, buffer, SIZE, 0);
+    
+	if (n <= 0)
 	{
-		n = recv(socketclient, buffer, MAX, 0);
-		
-		if (n <= 0)
-		{
-			break;
-			return;
-		}
-
-		fprintf(file, "%s", buffer);
-		bzero(buffer, MAX);
-	}
-	
-	return;
-}*/
+      break;
+    }
+    
+	fprintf(fp, "%s", buffer);
+    bzero(buffer, SIZE);
+  }
+  
+  return;
+}
 
 /*
 Method to send and receive information:
@@ -439,7 +428,7 @@ int main()
 	free(dynString);
 	
 	//This is a test for sentence splitting
-	char testSentence[] = ("How many times can I abcd the string");
+	char testSentence[] = ("How many times can I split the string");
 	int testWordNumber = getNumberOfWords(testSentence);
 	printf("%s\n", testSentence);
 	char** sentenceArray = generateSentenceArray(testSentence,testWordNumber,46);
