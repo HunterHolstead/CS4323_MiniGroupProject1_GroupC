@@ -4,6 +4,7 @@ Compile the server: "gcc -o server serverDriver.c -lpthread"
 Compile the client: "gcc -o client clientDriver.c MessagePassing.c -lpthread"
 Run server: ./server
 Run client: ./client
+***Note: Server must be ran before client in order to properly work!
 
 OVERVIEW: 
 This program is designed to create a multithreaded server which receives messages from clients, 
