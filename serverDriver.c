@@ -58,7 +58,7 @@ void main(){
         addQueue(socket_client);
 
         //send client a message of the thread number it is using
-        printf("\n \nThreads in Use %d \n Queue Count is%d\n\n", threadsInUse, queueCount);
+        printf("\n \nThreads in Use %d \n Queue Count is %d\n\n", threadsInUse, queueCount);
         send(socket_client, &totalClients, sizeof(totalClients), 0);
         totalClients++;
     }

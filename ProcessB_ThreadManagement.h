@@ -28,6 +28,7 @@ pthread_mutex_t mutex;
 int reuse = 0;
 int threadBusy = 0;
 
+/*
 // Get a unique filename for saving (uses Random from HunterHolstead.h)
 char* getFileName(const char* strPrefix) {
 	// Allocate space for the new filename and apply the prefix
@@ -55,7 +56,7 @@ char* getFileName(const char* strPrefix) {
 	
 	return fileName;
 }
-
+*/
 
 // Function for Thread T to run (string, size, and key sent via struct)
 char* EncryptAndSend(struct theMessage* encryptMsg) {

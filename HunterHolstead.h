@@ -308,7 +308,7 @@ void sendFileToServer(FILE *file, int socketclient)
 
 void sendMessageToServer(int socketclient, char *encryptedMessage, int q)
 {
-	send(socketclient, q, sizeof(int),0);
+	send(socketclient, &q, sizeof(int),0);
 	send(socketclient, encryptedMessage, sizeof(char),0);
 }
 
@@ -418,7 +418,7 @@ client runs: receiveFileFromServer();
 */
 
 
-
+/*
 //This main method is just a series of tests written for each method
 int main()
 {
@@ -496,7 +496,7 @@ int main()
 	
 	return 0;
 }
-
+*/
 /*left to do:
 Break a sentence up into words.
 Pass each word into checkword

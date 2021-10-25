@@ -37,6 +37,7 @@ int menu(int socket_client) {
                 messagePass(pid, socket_client);
             case 2: // receive file from server
                 // Process B should be killed (as with thread T)
+                
             case 3: // exit program
                 printf("\nProgram Terminated\n");
                 kill(0, SIGKILL); // kill all running processes
@@ -180,7 +181,6 @@ int accessPBThreadManage(char message[], int socket_client) {
     printf("Pointer: %p\n", heapString);
 
     sendMessageToServer(socket_client, heapString, myKey);
-	
 	// Free the heap memory associated with the thread pointer
 	printf("Freeing memory for pointer %p...\n", ptrThreadT);
 	free(ptrThreadT);
