@@ -19,7 +19,7 @@ int main() {
         recv(socket_client, &threadNumber, sizeof(threadNumber), 0);
         if(threadNumber < 3){ 
             printf("DISPLAY MENU\n");
-            menu(); // begin by displaying the menu to the user - fixed
+            menu(socket_client); // begin by displaying the menu to the user 
         } else {
             printf("Unable to help client - Threads are full.\n");
             break;

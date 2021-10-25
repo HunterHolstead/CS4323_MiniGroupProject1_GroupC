@@ -10,10 +10,10 @@
 #include <signal.h>
 
 // define functions
-int menu(); // menu function at the beginning of program
-int messagePass(pid_t pid); // to handle message passing requirements
+int menu(int socket_client); // menu function at the beginning of program
+int messagePass(pid_t pid, int socket_client); // to handle message passing requirements
 
-int accessPBThreadManage(char message[]); // access the necessary info from Kyle's file
+int accessPBThreadManage(char message[], int socket_client); // access the necessary info from Kyle's file
 
 char* getMessage(char message[]); // retrieve user message 
 char* lowerCase(char message[], char temp[]); // convert message to all lower case

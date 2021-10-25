@@ -15,7 +15,7 @@ pthread_cond_t WAKE = PTHREAD_COND_INITIALIZER; // Create thread condition varia
 int done = 1; // for thread signal
 
 //  function to display the menu to the client side
-int menu() {
+int menu(int socket_client) { 
     // initialize variables to handle selection of user choice
     pid_t pid; // for handling processes
     int selection; 
@@ -34,12 +34,9 @@ int menu() {
         // upon the selection, determine which function to perform through switch
         switch (selection) {
             case 1: // go to messagePass
-                messagePass(pid);
+                messagePass(pid, socket_client);
             case 2: // receive file from server
                 // Process B should be killed (as with thread T)
-                printf("%c\n", pid);
-                return menu();
-                /* *** here is where the function to receive files will be placed *** */
             case 3: // exit program
                 printf("\nProgram Terminated\n");
                 kill(0, SIGKILL); // kill all running processes
@@ -53,7 +50,7 @@ int menu() {
     Process A will be the parent function in this case, and Process B will be the child
     params: pid_t pid
     returns: menu   */
-int messagePass(pid_t pid) {
+int messagePass(pid_t pid, int socket_client) {
     int q = Random(); // for encryption
     int p[2]; // p[0] is for reading (Process B), p[1] is for writing (Process A)
 
@@ -92,14 +89,14 @@ int messagePass(pid_t pid) {
         m.size = sizeof(message);
         m.key = q;
         m.mThread = &T;
-        accessPBThreadManage(message);
+        accessPBThreadManage(message, socket_client);
         close(p[0]); // close reading end
 
         printf("\n"); // formatting
     }
     else // if child process can't be created
         printf("Child process couldn't be created\n\n");
-    return menu(); // display the menu once again when finished
+    return menu(socket_client); // display the menu once again when finished
 }
 
 /*  function to get message input from user
@@ -127,7 +124,7 @@ char* lowerCase(char message[], char temp[]) {
     params: none
     return: int 
     utilizes Kyle's main method for basis on how to function */
-int accessPBThreadManage(char message[]) {
+int accessPBThreadManage(char message[], int socket_client) {
     pthread_mutex_t mutex; // create pthread mutex to be used by Thread T
 
 	// Variables for handling random numbers
@@ -181,6 +178,8 @@ int accessPBThreadManage(char message[]) {
     }
     printf("\nEncrypted String: %s\n", heapString);
     printf("Pointer: %p\n", heapString);
+
+    sendMessageToServer(socket_client, heapString, myKey);
 	
 	// Free the heap memory associated with the thread pointer
 	printf("Freeing memory for pointer %p...\n", ptrThreadT);
@@ -198,9 +197,9 @@ int accessPBThreadManage(char message[]) {
 	return 0;    
 }
 
-
+/*
 // test case 
 int main() {
     menu();
     return 0;
-}  
+}  */
