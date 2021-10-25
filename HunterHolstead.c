@@ -146,6 +146,42 @@ char *Decrypt(char *decryptString, int size, int q)
 	return decryptString;
 }
 
+// Compare strings without case sensitivity
+int strCompare(char* a, char* b, int flag) {
+	int i = 0;
+	while (a[i] != '\0' && b[i] != '\0') {
+		if (a[i] != b[i]) {
+			// Check if either character is lowercase, in which case there may be a case discrepancy
+			if (a[i] > 96 && a[i] < 123) {
+				// a[i] is lowercase
+				if (b[i] + 32 != a[i]) {
+					return 0; // Not the same letter
+				}
+			}
+			else if (b[i] > 96 && b[i] < 123) {
+				// b[i] is lowercase
+				if (a[i] + 32 != b[i]) {
+					return 0; // Not the same letter
+				}
+			}
+			else {
+				return 0; // Not the same letter
+			}
+		}		
+
+		i++;
+	}
+	
+	// If here, no discrepancies were found; check that the strings are the same length
+	if (a[i] < 32 && b[i] < 32) {
+		return 1; // Terminate at same index; equivalent
+	}
+	else {
+		printf("a: %s, b: %s\n", a, b);
+		return 0;
+	}
+}
+
 int checkWord(char *test)
 {
 	int listlength = 58122;
@@ -154,13 +190,14 @@ int checkWord(char *test)
     char** dictionary = generateDictionary(listlength, wordslength);
 	//char test[] = "apple";//*word;
 	char* result;
+	int intResult;
 	int isIn;
 
     for(int i=0;i<58122;i++)
 	{
-		result = strstr(dictionary[i],test);
-		
-		if(result)
+		//result = strstr(dictionary[i],test);
+		intResult = strCompare(dictionary[i], test, i);		
+		if(intResult)
 		{
 			isIn=1;
 			break;
