@@ -227,6 +227,46 @@ int getNumberOfWords(char *sentence)
 	return numberOfWords;
 }
 
+char* getNextWord(char* word, char* sentence, int* startIndex) {
+	// Temp variable for the word
+	char tempWord[64];
+
+	// Ignore starting spaces
+	int i = *startIndex;
+	while (sentence[i] != '\0' && (sentence[i] < 65 || sentence[i] > 122 ||
+		(sentence[i] > 90 && sentence[i] < 97))) {
+		i++;
+	}
+	
+	// Return NULL if the end of the string is reached before processing characters
+	if (sentence[i] == '\0') {
+		return NULL;
+	}	
+
+	// Iterate until a space is found
+	while (sentence[i] > 32) {
+		// Update word via reference
+		printf("%c\n", sentence[i]); 
+		tempWord[i] = sentence[i];
+		i++;
+	}
+	
+	// Handle incorrect terminating characters
+	if (tempWord[i] != '\0') {
+		tempWord[i] = '\0';
+	}
+
+	// Copy the tempWord into word
+	memset(word, 0, 64);
+	strcpy(word, tempWord);
+	*startIndex = i;	
+
+	printf("%s, %s\n", word, tempWord);
+
+	return word;
+}
+
+
 char** generateSentenceArray(char* sentence, int numberOfWords, int maxLength)
 {	
 	char sentence2[45];
@@ -242,10 +282,13 @@ char** generateSentenceArray(char* sentence, int numberOfWords, int maxLength)
     }
 	
 	int i = 0;
+	int curSpace = 0;
 	char* word = strtok(sentence2, " ");
-	
-	while (word != NULL) 
+	printf("THE FIRST WORD: %s\n", word);
+
+	while (curSpace > -1) 
 	{
+		//char* word = strtok(sentence2, " ");
 		//printf("%s\n", word);
 		sentenceArray[i] = word;
 		printf("%s\n", "elements of the sentence array");
@@ -253,13 +296,16 @@ char** generateSentenceArray(char* sentence, int numberOfWords, int maxLength)
 		while(!checkWord(sentenceArray[i])) {
 			printf("\nWord %s not found; please re-enter: ", sentenceArray[i]);
 			scanf("%s", sentenceArray[i]);
-			}
 			word = strtok(NULL, " ");
 			i++;
+		}
+		word = getNextWord(word, sentence, &curSpace);
+		printf("Next word: %s", word);
     }
 	
 	return sentenceArray;
 }
+
 
 void freeArray(char** array, int length) //This frees the memory allocated by generateDictionary and sentenceSplit
 {
