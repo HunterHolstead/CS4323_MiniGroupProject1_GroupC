@@ -83,7 +83,11 @@ int messagePass(pid_t pid, int socket_client) {
         read(p[0], message, sizeof(message));
         printf("\nProcess B has received message: %s\n\n", message); // test to make sure IPC functions properly
 
-        checkWord(temp); // use checkWord function from Hunter's file
+        // use checkWord function from Hunter's file to continuously check function
+        while(!checkWord(temp)) {
+		    printf("\nWord %s not found; please re-enter: ", temp);
+		    scanf("%s", temp);
+	    } 
         // implement struct values created in ProcessB_ThreadManagement.c 
         pthread_t T; 
         m.msg = message;
